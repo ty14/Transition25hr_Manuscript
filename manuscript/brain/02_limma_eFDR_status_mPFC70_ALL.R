@@ -11,7 +11,7 @@ grcm38 # mouse genes
 library(tidyverse)
 
 # Bring in count data for mPFC
-a_countdata <- read_csv("brain/PFC_25hcounts.csv")
+a_countdata <- read_csv("brain/PFC_counts.csv")
 a_countdata$X -> nrows
 a_count <- a_countdata[,-1]
 dlNorm <-as.data.frame(a_count)
@@ -20,7 +20,7 @@ a_count <- a_count[,c(1:19,21:24)]
 row.names(dlNorm) <- nrows
 
 #Getting metadata ready 
-coldata <- read_csv("brain/sample25hr_table.csv")
+coldata <- read_csv("brain/sample70min_table.csv")
 head(coldata)
 str(coldata)
 
@@ -44,17 +44,16 @@ coldata$condition1 <- ifelse(coldata$condition == "descenders" & coldata$Postran
 coldata$condition1 <- ifelse(coldata$condition == "ascenders" & coldata$Prerank == 4 & coldata$Postrank == 1, "ASC", coldata$condition1)
 
 coldata$condition1  <- coldata$condition1  %>% replace_na('SUB')
-coldata <- coldata %>% 
-  filter(region == "P")
+pfc_data1<- coldata %>% 
+  filter(region != "AMY") %>% 
+  filter(Postrank != 3) %>% 
+  filter(condition1 != "control") %>% 
+  filter(condition1 != "ascenders")
 
-
-#remove outlier 
-
-#b1.2.1 outlier DES
-pfc_data1<- coldata[c(1:19,21:24),]
+table(coldata$condition1)
 
 #just get samples I want
-row.names <- pfc_data1$SampleNames
+row.names <- pfc_data1$SampleName
 
 # coldata <- coldata %>% dplyr::select(-SampleName)
 
@@ -83,16 +82,16 @@ cutoff <- 10
 drop <- which(apply(cpm(d0), 1, max) < cutoff)
 dge.dl <- d0[-drop,]
 dim(dge.dl)
-#13066    23
+# [1] 12647    28
 
 # Now take out groups that you want
 #DOMs first 
 dge.dl$samples$group
 
 pfc_data1%>% 
-  dplyr::select(SampleNames, condition1) -> var_info  
+  dplyr::select(SampleName, condition1) -> var_info  
 
-row.names <- var_info$SampleNames
+row.names <- var_info$SampleName
 
 row.names(var_info) <- row.names #Assigning row names from as sample names  
 head(var_info)
@@ -126,7 +125,7 @@ efit.dl2 = eBayes(vfit.dl2)
 p.dl.limma2 = efit.dl2[["p.value"]]
 head(p.dl.limma2)
 
-saveRDS(v.dl, "manuscript/brain/results/limma_vdl_PFC_ReorganizedGroups_outlierremoved.RDS")
+saveRDS(v.dl, "manuscript/brain/results/limma_vdl_PFC70min_ReorganizedGroups.RDS")
 
 
 
@@ -181,9 +180,9 @@ q.dl = as.data.frame(q.dl)
 row.names(q.dl) <- rownames(dge.dl)
 colnames(q.dl) <- mycolnames
 
-saveRDS(q.dl,("manuscript/brain/results/limma_vdl_cutoff5_2000_tworand_PFC_70_ReorganizedGroups_outlierRemoved.RDS"))
+saveRDS(q.dl,("manuscript/brain/results/limma_vdl_cutoff5_2000_tworand_PFC70min_ReorganizedGroups.RDS"))
 
-q.dl <- readRDS("manuscript/brain/results/limma_vdl_cutoff5_2000_tworand_PFC_70_ReorganizedGroups_outlierRemoved.RDS")
+q.dl <- readRDS("manuscript/brain/results/limma_vdl_cutoff5_2000_tworand_PFC70min_ReorganizedGroups.RDS")
 
 
 
@@ -250,7 +249,7 @@ topTable(tmp6, sort.by = "P", n = Inf) %>%
   dplyr::select(symbol,logFC,P.Value,adj.P.Val) -> limma_list$dessub
 
 
-saveRDS(limma_list,"manuscript/brain/results/limma_PFC_ReorganizedGroups_outlierRemoved.RDS")
+saveRDS(limma_list,"manuscript/brain/results/limma_PFC70min_ReorganizedGroup.RDS")
 
 
 #quick look at number of genes

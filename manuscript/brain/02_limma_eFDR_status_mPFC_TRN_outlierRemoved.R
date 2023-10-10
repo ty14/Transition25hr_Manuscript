@@ -10,7 +10,7 @@ library(annotables)
 grcm38 # mouse genes
 library(tidyverse)
 
-# Bring in count data for mPFC
+# Bring in count data for MEA
 a_countdata <- read_csv("brain/PFC_25hcounts.csv")
 a_countdata$X -> nrows
 a_count <- a_countdata[,-1]
@@ -40,8 +40,8 @@ table(coldata$condition)
 
 coldata$condition1 <- ifelse(coldata$condition == "same" & coldata$Prerank == 1, "DOM", coldata$condition)
 coldata$condition1 <- ifelse(coldata$condition1 == "same" & coldata$Prerank == 4, "SUB", coldata$condition1)
-coldata$condition1 <- ifelse(coldata$condition == "descenders" & coldata$Postrank == 4 & coldata$Prerank == 1, "DES", coldata$condition1)
-coldata$condition1 <- ifelse(coldata$condition == "ascenders" & coldata$Prerank == 4 & coldata$Postrank == 1, "ASC", coldata$condition1)
+coldata$condition1 <- ifelse(coldata$condition == "descenders" & coldata$Postrank == 4 & coldata$Prerank == 1, "TRN", coldata$condition1)
+coldata$condition1 <- ifelse(coldata$condition == "ascenders" & coldata$Prerank == 4 & coldata$Postrank == 1, "TRN", coldata$condition1)
 
 coldata$condition1  <- coldata$condition1  %>% replace_na('SUB')
 coldata <- coldata %>% 
@@ -68,7 +68,6 @@ all(rownames(pfc_data1) == colnames(dlNorm))
 #normalize and filter with all groups 
 row.names(dlNorm) <- nrows
 
-
 # dlNorm <- dlNorm[!is.na(rowSums(dlNorm)),]
 
 d = apply(dlNorm, 2, as.numeric)
@@ -83,13 +82,13 @@ cutoff <- 10
 drop <- which(apply(cpm(d0), 1, max) < cutoff)
 dge.dl <- d0[-drop,]
 dim(dge.dl)
-#13066    23
+#13189    24
 
 # Now take out groups that you want
 #DOMs first 
 dge.dl$samples$group
 
-pfc_data1%>% 
+pfc_data1 %>% 
   dplyr::select(SampleNames, condition1) -> var_info  
 
 row.names <- var_info$SampleNames
@@ -102,7 +101,7 @@ all(rownames(var_info) == colnames(dlNorm)) #check
 
 ##following Won's code
 var_info$condition1 %>%
-  factor(.,levels = c("DOM","ASC","DES", "SUB")) -> group.dl
+  factor(.,levels = c("TRN", "DOM", "SUB")) -> group.dl
 
 
 design.dl <- model.matrix(~ 0 + group.dl)
@@ -111,12 +110,9 @@ colnames(design.dl) -> mycolnames
 v.dl = voom(dge.dl, design.dl, plot = F)
 vfit.dl = lmFit(v.dl, design.dl)
 
-contrast.matrix <- makeContrasts(group.dlASC-group.dlDOM,
+contrast.matrix <- makeContrasts(group.dlTRN-group.dlDOM,
+                                 group.dlTRN-group.dlSUB,
                                  group.dlDOM-group.dlSUB,
-                                 group.dlDES-group.dlDOM, 
-                                 group.dlDES-group.dlASC,
-                                 group.dlASC-group.dlSUB,
-                                 group.dlDES-group.dlSUB,
                                  levels=design.dl)
 
 vfit.dl2 <- contrasts.fit(vfit.dl, contrast.matrix)
@@ -126,11 +122,11 @@ efit.dl2 = eBayes(vfit.dl2)
 p.dl.limma2 = efit.dl2[["p.value"]]
 head(p.dl.limma2)
 
-saveRDS(v.dl, "manuscript/brain/results/limma_vdl_PFC_ReorganizedGroups_outlierremoved.RDS")
+saveRDS(v.dl, "manuscript/brain/results/limma_vdl_PFC_TRN_outlierremoved.RDS")
 
 
 
-i = 4
+i = 3
 
 # How many random sampling
 R = 5000
@@ -167,7 +163,7 @@ for(h in 1 : R){
   
   temp = p.dl.rand[[h]]
   
-  for(c in 1 : 6){
+  for(c in 1 : 3){
     for(r in 1 : nrow(p.dl.limma2)){
       if(temp[r, c] <= p.dl.limma2[r, c]){
         q.dl[r, c] = q.dl[r, c] + 1
@@ -181,9 +177,9 @@ q.dl = as.data.frame(q.dl)
 row.names(q.dl) <- rownames(dge.dl)
 colnames(q.dl) <- mycolnames
 
-saveRDS(q.dl,("manuscript/brain/results/limma_vdl_cutoff5_2000_tworand_PFC_70_ReorganizedGroups_outlierRemoved.RDS"))
+saveRDS(q.dl,("manuscript/brain/results/limma_vdl_cutoff5_2000_tworand_PFC_70_TRN_outlierremoved.RDS"))
 
-q.dl <- readRDS("manuscript/brain/results/limma_vdl_cutoff5_2000_tworand_PFC_70_ReorganizedGroups_outlierRemoved.RDS")
+q.dl <- readRDS("manuscript/brain/results/limma_vdl_cutoff5_2000_tworand_PFC_70_TRN_outlierremoved.RDS")
 
 
 
@@ -191,17 +187,12 @@ efit.dl2[["p.value"]] <- q.dl
 row.names(q.dl) <- NULL
 sum(duplicated(row.names(efit.dl2$coefficients)))
 
-tmp1 <- contrasts.fit(efit.dl2, coef = 1) # DOM_ASC
+tmp1 <- contrasts.fit(efit.dl2, coef = 1) # TRN-DOM
 
-tmp2 <- contrasts.fit(efit.dl2, coef = 2) #DOM-SUB
+tmp2 <- contrasts.fit(efit.dl2, coef = 2) #TRN-SUB
 
-tmp3 <- contrasts.fit(efit.dl2, coef = 3) #DES-DOM
+tmp3 <- contrasts.fit(efit.dl2, coef = 3) #DOM-SUB
 
-tmp4 <- contrasts.fit(efit.dl2, coef = 4) #DES-ASC
-
-tmp5 <- contrasts.fit(efit.dl2, coef = 5) #ASC-SUB
-
-tmp6 <- contrasts.fit(efit.dl2, coef = 6) #DES-SUB
 
 limma_list <- list()
 
@@ -210,15 +201,14 @@ topTable(tmp1, sort.by = "P", n = Inf) %>%
   rownames_to_column('ensgene') %>%
   left_join(grcm38) %>%
   filter(!is.na(symbol)) %>% 
-  dplyr::select(symbol,logFC,P.Value,adj.P.Val) ->limma_list$ascdom
-
+  dplyr::select(symbol,logFC,P.Value,adj.P.Val) ->limma_list$tdom
 
 
 topTable(tmp2, sort.by = "P", n = Inf) %>%
   rownames_to_column('ensgene') %>%
   left_join(grcm38) %>%
   filter(!is.na(symbol)) %>%
-  dplyr::select(symbol,logFC,P.Value,adj.P.Val)  -> limma_list$domsub
+  dplyr::select(symbol,logFC,P.Value,adj.P.Val)  -> limma_list$tsub
 
 
 
@@ -226,31 +216,10 @@ topTable(tmp3, sort.by = "P", n = Inf) %>%
   rownames_to_column('ensgene') %>%
   left_join(grcm38) %>%
   filter(!is.na(symbol)) %>%
-  dplyr::select(symbol,logFC,P.Value,adj.P.Val) -> limma_list$desdom
+  dplyr::select(symbol,logFC,P.Value,adj.P.Val) -> limma_list$ds
 
 
-topTable(tmp4, sort.by = "P", n = Inf) %>%
-  rownames_to_column('ensgene') %>%
-  left_join(grcm38) %>%
-  filter(!is.na(symbol)) %>%
-  dplyr::select(symbol,logFC,P.Value,adj.P.Val) -> limma_list$desasc
-
-
-topTable(tmp5, sort.by = "P", n = Inf) %>%
-  rownames_to_column('ensgene') %>%
-  left_join(grcm38) %>%
-  filter(!is.na(symbol)) %>%
-  dplyr::select(symbol,logFC,P.Value,adj.P.Val) -> limma_list$ascsub
-
-
-topTable(tmp6, sort.by = "P", n = Inf) %>%
-  rownames_to_column('ensgene') %>%
-  left_join(grcm38) %>%
-  filter(!is.na(symbol)) %>%
-  dplyr::select(symbol,logFC,P.Value,adj.P.Val) -> limma_list$dessub
-
-
-saveRDS(limma_list,"manuscript/brain/results/limma_PFC_ReorganizedGroups_outlierRemoved.RDS")
+saveRDS(limma_list,"manuscript/brain/results/limma_PFC_TRN_outlierremoved.RDS")
 
 
 #quick look at number of genes
