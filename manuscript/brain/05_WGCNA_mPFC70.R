@@ -26,11 +26,12 @@ colnames(dlNorm)[c(1:67)] <- substr(colnames(dlNorm)[c(1:67)], 7, 13)
 
 #Group traits
 #Getting metadata ready 
-coldata <- read.csv("manuscript/brain/results_tables/coldata.csv", row.names = 1)
+coldata <- read.csv("manuscript/brain/results_tables/coldata.csv")
 
 # get rid of controls
 coldata <- coldata %>% filter(condition != "control")
 
+coldata <- coldata %>% column_to_rownames(., var = "SampleID")
 #check before normalizing 
 dlNorm<- dlNorm[, rownames(coldata)]
 all(rownames(coldata) == colnames(dlNorm))
@@ -61,12 +62,12 @@ dge.dl$samples$group
 
 
 coldata %>% 
-  dplyr::select(SampleID, condition1) -> var_info  
+  dplyr::select(condition1) -> var_info  
 
-row.names <- var_info$SampleID
+# row.names <- var_info$SampleID
 
-row.names(var_info) <- row.names #Assigning row names from as sample names  
-head(var_info )
+# row.names(var_info) <- row.names #Assigning row names from as sample names  
+head(var_info)
 
 dlNorm<- dlNorm[, rownames(var_info)]
 all(rownames(var_info) == colnames(dlNorm)) #check
@@ -91,7 +92,7 @@ rownames(datExpr)
 
 # getting trait data
 colnames(coldata)
-amy <- coldata[c(2,4,5,10:12,15:19)]
+amy <- coldata[c(2,8,10,14,16,17,20,21)]
 
 ifelse(amy$condition1 == "DOM", 2, amy$condition1) -> amy$condition2
 ifelse(amy$condition2 == "DES", 1, amy$condition2) -> amy$condition2
@@ -104,10 +105,10 @@ amy1 <- amy %>%
   dplyr::select(-condition1)
 
 #make everything numeric 
-amy1[1:11] <- lapply(amy1[1:11], as.numeric)
+amy1[1:8] <- lapply(amy1[1:8], as.numeric)
 
 #saving to use for other WGCNA analysis 
-write.csv(amy1, "manuscript/brain/results_tables/TraitsforWGCNA_mPFC70.csv", row.names = T)
+write.csv(amy1, "manuscript/brain/results_tables/TraitsforWGCNA_mPFC70.csv", row.names = F)
 
 
 sampleTree = hclust(dist(datExpr), method = "average");
@@ -255,7 +256,10 @@ rownames(datExpr)
 
 
 # getting trait data
-p1 <- read.csv("manuscript/brain/results_tables/TraitsforWGCNA_mPFC70.csv",row.names = 1 )
+colnames(coldata)
+coldata$condition1
+
+p1 <- read_csv("manuscript/brain/results_tables/TraitsforWGCNA_mPFC70.csv")
 # Re-cluster samples with out any samples filtered 
 sampleTree2 = hclust(dist(datExpr), method = "average")
 # Convert traits to a color representation: white means low, red means high, grey means missing entry
@@ -290,7 +294,7 @@ saveRDS(MEs,"manuscript/brain/results/WGCNA_MEs_mPFC70_Power5.RDS")
 dev.off() # make sure you do this before AND after
 
 png(file = "manuscript/brain/imgs/module_trait_mPFC70_Power5.png",
-    width=1000, height=1800, res = 130)
+    width=2000, height=2600, res = 300)
 
 # Will display correlations and their p-values
 textMatrix =  paste(signif(moduleTraitCor, 2), "\n(",
@@ -416,8 +420,7 @@ MEs0 = moduleEigengenes(datExpr, moduleColors)$eigengenes
 
 # get linear model data 
 #Getting metadata ready 
-coldata <- read.csv("manuscript/brain/results_tables/coldata.csv", row.names = 1)
-
+coldata <- read.csv("manuscript/brain/results_tables/coldata.csv")
 # get rid of controls
 coldata <- coldata %>% filter(condition != "control")
 
@@ -425,14 +428,17 @@ coldata <- coldata %>% filter(condition != "control")
 cd <- coldata %>% filter(condition1 != "SUB")
 
 cd$condition1 <- factor(cd$condition1, levels = c("DOM", "DES", "ASC"))
+# cd <- cd %>% rownames_to_column(., var = "SampleID")
+cd$pre_id <- str_sub(cd$pre_idbatchcage,1,1)
+cd$post_id <- str_sub(cd$post_idbatch, 1,1)
 
-
+MEs0
 orderMEs(MEs0) %>% 
   rownames_to_column("SampleID") %>%
   left_join(cd) %>% 
   mutate(batch = as.factor(batch)) %>% 
   mutate_if(is.numeric,scale) %>% 
-  relocate(condition1, batch, post_Ncort, Postrank, Postds, Preds, AggGiven70min, AggRec70min ) %>% 
+  relocate(condition1, batch, pre_id, post_id, post_Ncort, Postds, Preds,given1, received1 ) %>% 
   dplyr::select(-SampleID, -post_idbatch, -mean_con_ng_ul, -pre_idbatch, -pre_idbatchcage,
                 -time, -Prerank, -condition, -wt_d4, -wt_d8, -wt_12, -region) %>% na.omit(.)-> ME_df
 
@@ -447,7 +453,7 @@ for(x in 1:length(MEs0)){
   ME_df[,c(1:8,k)] -> df
   md <- gsub("ME","",colnames(df)[9])
   colnames(df)[9] <- "module"
-  lmer(module ~ condition1 +(1|batch) , data = df) -> mod1
+  lmer(module ~ condition1 +(1|batch)+(1|pre_id)+(1|post_id) , data = df) -> mod1
   summary(mod1)
   df
   rbind(summary(lm(df[,9] ~ df[,1]))$coefficients[2,],
@@ -459,7 +465,7 @@ for(x in 1:length(MEs0)){
 
 lm_result_list %>% 
   do.call(rbind,.)%>% 
-  filter(.,module != "grey") %>% format(., scientific = F) -> d
+  filter(.,module != "grey") %>% filter(., module != "received1")  %>% format(., scientific = F) -> d
 
 unique(d$module)
 
@@ -482,33 +488,44 @@ dom_dot <- d %>%
   geom_point(size = 3)+
   facet_wrap(~key)+
   labs(y="", color = "p-value")+
+  xlim(-2,2)+
   scale_color_continuous(low = "red", high = "lightgray", breaks = c(0.01, 0.02,0.03,0.04, 0.05))+
   geom_errorbar(aes(xmin = Estimate-`Std. Error`, xmax = Estimate+`Std. Error`),width = 0.4)+
   scale_y_discrete(limits = rev(levels(d$module)))+
   theme_bw()+
-  theme(text = element_text(size = 15))
+    theme(text = element_text(size = 15))
 
 dom_dot 
 
 ggsave("manuscript/brain/imgs/dom70_dot.png", dom_dot, width = 7, height = 6)
+
+
+coldata <- read.csv("manuscript/brain/results_tables/coldata.csv")
+# get rid of controls
+coldata <- coldata %>% filter(condition != "control")
+
 
 cs <- coldata %>% filter(condition1 != "DOM")
 
 
 cs$condition1 <- factor(cs$condition1, levels =c("SUB", "DES", "ASC"))
 
+cs$pre_id <- str_sub(cd$pre_idbatchcage,1,1)
+cs$post_id <- str_sub(cd$post_idbatch, 1,1)
 
+MEs0
 orderMEs(MEs0) %>% 
   rownames_to_column("SampleID") %>%
   left_join(cs) %>% 
   mutate(batch = as.factor(batch)) %>% 
   mutate_if(is.numeric,scale) %>% 
-  relocate(condition1, batch, post_Ncort, Postrank, Postds, Preds, AggGiven70min, AggRec70min ) %>% 
+  relocate(condition1, batch, pre_id, post_id, post_Ncort, Postds, Preds,given1, received1 ) %>% 
   dplyr::select(-SampleID, -post_idbatch, -mean_con_ng_ul, -pre_idbatch, -pre_idbatchcage,
                 -time, -Prerank, -condition, -wt_d4, -wt_d8, -wt_12, -region) %>% na.omit(.)-> ME_df
 
 lm_result_list <- list()
 
+ME_df$condition1
 library(lme4)
 library(lmerTest)
 
@@ -517,7 +534,7 @@ for(x in 1:length(MEs0)){
   ME_df[,c(1:8,k)] -> df
   md <- gsub("ME","",colnames(df)[9])
   colnames(df)[9] <- "module"
-  lmer(module ~ condition1 +(1|batch) , data = df) -> mod1
+  lmer(module ~ condition1 +(1|batch)+(1|pre_id)+(1|post_id) , data = df) -> mod1
   summary(mod1)
   df
   rbind(summary(lm(df[,9] ~ df[,1]))$coefficients[2,],
@@ -529,7 +546,7 @@ for(x in 1:length(MEs0)){
 
 lm_result_list %>% 
   do.call(rbind,.)%>% 
-  filter(.,module != "grey") %>% format(., scientific = F) -> d
+  filter(.,module != "grey") %>% filter(., module != "received1")  %>% format(., scientific = F) -> d
 
 unique(d$module)
 
@@ -573,9 +590,9 @@ ggsave("manuscript/brain/imgs/sub70_dot.png", sub_dot, width = 7, height = 6)
 my_trait = "Status"
 module = "green"
 module = "blue"
-module = "cyan"
+module = "greenyellow"
 module = "pink"
-module = 'magenta'
+module = 'black'
 module = 'turquoise'
 module = 'yellow'
 module = 'darkgrey'
@@ -585,7 +602,7 @@ module = 'red'
 module = 'grey60'
 
 
-module_list = c("grey60","red", "darkturquoise", 'turquoise', 'royalblue', 'darkgrey', "yellow", "magenta", "pink", "cyan", "blue", "green")
+module_list = c("grey60","red", "darkturquoise", 'turquoise', 'royalblue', 'darkgrey', "yellow", "black", "pink", "greenyellow", "blue", "green")
 hub_gene_list = vector('list', length = length(module_list))
 names(hub_gene_list) <- module_list
 
