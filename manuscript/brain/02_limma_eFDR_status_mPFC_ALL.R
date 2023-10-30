@@ -61,6 +61,12 @@ row.names <- pfc_data1$SampleNames
 row.names(pfc_data1) <- row.names #Assigning row names from as sample names  
 head(coldata)
 
+table(pfc_data1$condition1)
+
+colnames(pfc_data1)
+
+write.csv(pfc_data1,"manuscript/brain/results_tables/coldata25hr.csv", row.names = F)
+
 #check before normalizing 
 dlNorm<- dlNorm[, rownames(pfc_data1)]
 all(rownames(pfc_data1) == colnames(dlNorm))

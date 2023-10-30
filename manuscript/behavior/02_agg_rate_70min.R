@@ -16,7 +16,7 @@ df1 <- read_csv("behavior/Pre_WL.csv")
 l1 <- split(df1, df1$pre_batchcage)
 
 # just keep winner loser columns
-l1.wl <- l1 %>% map(~ select(., winner,loser) %>% as.data.frame) 
+l1.wl <- l1 %>% map(~ dplyr::select(., winner,loser) %>% as.data.frame) 
 
 # convert list to win-loss matrices organized by David's Scores
 l1.mat <- l1.wl %>% map(~ compete::get_wl_matrix(.)) %>% map(~ compete::org_matrix(., method="ds"))
@@ -58,14 +58,31 @@ l.aggr.df$pre_idbatchcage <- paste0(l.aggr.df$preid, l.aggr.df$pre_idbatchcage)
 
 #join with coldata to use in WGCNA clustering. 
 
-coldata <- read.csv("manuscript/brain/results_tables/coldata.csv", row.names = 1)
+coldata <- read.csv("manuscript/brain/results_tables/coldata.csv")
 # get rid of controls
-coldata <- coldata %>%  select(-AggGiven70min, -AggRec70min)
+coldata <- coldata %>%  dplyr::select(-AggGiven70min, -AggRec70min)
 str(coldata)
 str(l.aggr.df)
 
-agg_df <- l.aggr.df %>% select(pre_idbatchcage, given, received, given1,received1)
+agg_df <- l.aggr.df %>% dplyr::select(pre_idbatchcage, given, received, given1,received1)
 coldata$pre_idbatchcage
 post.df <- coldata %>% full_join(agg_df) %>% na.omit(.)
 
-write.csv(post.df, "manuscript/brain/results_tables/coldata.csv", row.names = F)
+# write.csv(post.df, "manuscript/brain/results_tables/coldata.csv", row.names = F)
+
+
+
+## join for 25 hr data 
+df25 <- read_csv("manuscript/brain/results_tables/coldata25hr.csv")
+head(df25)
+
+
+df25$SampleNames <- gsub(".trim.sam.count", "", df25$SampleNames)
+colnames(df25)
+
+xx <- df25 %>% dplyr::select(-AggGiven70min, -AggRec70min) %>% full_join(agg_df) 
+table(xx$condition1)
+
+xx <- xx[1:23,]
+
+write.csv(xx, "manuscript/brain/results_tables/coldata25hr_use.csv", row.names = F)
