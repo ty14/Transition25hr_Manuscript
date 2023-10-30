@@ -150,13 +150,13 @@ nSamples = nrow(datExprx)
 
 # Re-cluster samples with out any samples filtered 
 var_info
-amy1x <- amy1[c(1,3:9, 11:28),]
-sampleTree2 = hclust(dist(datExpr), method = "average")
+amy1x <- amy1[c(1:7, 9:12,14:23),]
+sampleTree2 = hclust(dist(datExprx), method = "average")
 # Convert traits to a color representation: white means low, red means high, grey means missing entry
-traitColors = numbers2colors(amy1, signed = FALSE)
+traitColors = numbers2colors(amy1x, signed = FALSE)
 # Plot the sample dendrogram and the colors underneath.
 plotDendroAndColors(sampleTree2, traitColors,
-                    groupLabels = names(amy1),
+                    groupLabels = names(amy1x),
                     main = "AMY dendrogram and trait heatmap(all samples)")
 
 collectGarbage()
@@ -169,7 +169,7 @@ collectGarbage()
 # Choose a set of soft-thresholding powers
 powers = c(c(1:10), seq(from = 12, to=20, by=2))
 # Call the network topology analysis function
-sft = pickSoftThreshold(datExpr, powerVector = powers, verbose = 5, )
+sft = pickSoftThreshold(datExprx, powerVector = powers, verbose = 5, )
 # Plot the results:
 print(sft)
 sizeGrWindow(9, 5)
@@ -202,11 +202,11 @@ print(sft)
 # TOMType = c("signed", networkType = "signed hybrid")
 cor <- WGCNA::cor
 WGCNA_get_net <- function(my_tissue = "mPFC25hr",
-                          my_power =  4,
+                          my_power =  5,
                           my_TOMType ="signed", 
                           my_networkType = "signed hybrid"){
   
-  x <- readRDS("manuscript/brain/results/WGCNA_datExpr25.RDS") 
+  x <- readRDS("manuscript/brain/results/WGCNA_datExpr25_outliersRemoved.RDS") 
   set.seed(312)
   net = blockwiseModules(x, 
                          power = my_power,
@@ -221,7 +221,7 @@ WGCNA_get_net <- function(my_tissue = "mPFC25hr",
                          verbose = 3)
   
   
-  saveRDS(net, "manuscript/brain/results/WGCNA_net_mPFC25_Power4_minmod50.RDS")
+  saveRDS(net, "manuscript/brain/results/WGCNA_net_mPFC25_Power5_minmod50_OR.RDS")
   
 }
 
@@ -759,4 +759,86 @@ WGCNA_GOs %>%
 write.csv(wgcna_all_gos, 
           "manuscript/brain/results_tables/WGCNA_all_gos_catogeryBP_mPFC25.csv",
           row.names = F)
+
+
+
+#boxplots for 70 min WGCNA.
+
+library(WGCNA)
+library(tidyverse)
+
+coldata <- read.csv("manuscript/brain/results_tables/coldata25hr_use.csv")
+
+coldata$SampleNames <- substr(coldata$SampleNames, 6,11)
+
+MEs <- readRDS("manuscript/brain/results/WGCNA_MEs_mPFC25_Power4.RDS")
+
+ME_df <-MEs%>% data.frame() %>% 
+  tibble::rownames_to_column(var = "SampleNames") %>%
+  pivot_longer(cols = 2:16, names_to = "Module") %>% 
+  full_join(coldata) %>% filter(Module != "MEgrey") %>% 
+  mutate(status = condition1)
+
+head(ME_df)
+
+ME_df$Module <- gsub("ME", "", ME_df$Module)
+
+
+
+
+#boxplot of eigengenes and status 
+source("functions/geom_boxjitter.R")
+source("functions/newggtheme.R")
+
+
+
+ME_df %>% 
+  ggplot(aes(status, value, fill = status, color = status))+
+  geom_boxjitter(outlier.color = NA, jitter.shape = 21, jitter.color = NA,
+                 alpha = 0.3,
+                 jitter.height = 0.02, jitter.width = 0.07, errorbar.draw = TRUE,
+                 position = position_dodge(0.85)) +
+  # facet_wrap(~Module, ncol =5)+
+  scale_color_manual(values = viridis::viridis(4))+
+  scale_fill_manual(values = viridis::viridis(4))+         
+  labs(x = "Social condition",
+       y = "Module eigengene")+
+  facet_wrap(~Module) +newggtheme_with_legends+ 
+  theme(legend.position = "none", text =element_text(size =10))
+
+
+
+
+ME_df %>% 
+  ggplot(aes(post_Ncort, value, fill = status, color = status))+
+  geom_point()+   stat_smooth(method = "lm", se =F)+
+  scale_color_manual(values = viridis::viridis(4))+
+  scale_fill_manual(values = viridis::viridis(4))+         
+  labs(x = "Normalized CORT",
+       y = "Module eigengene")+
+  facet_wrap(~Module, ncol =4) +newggtheme_with_legends+ 
+  theme(text =element_text(size =10))
+
+ME_df %>% 
+  ggplot(aes(received1, value, fill = status, color = status))+
+  geom_point()+   stat_smooth(method = "lm", se =F)+
+  scale_color_manual(values = viridis::viridis(4))+
+  scale_fill_manual(values = viridis::viridis(4))+         
+  labs(x = "rate of agg. given",
+       y = "Module eigengene")+
+  facet_wrap(~Module, ncol =4) +newggtheme_with_legends+ 
+  theme(text =element_text(size =10))
+
+
+ME_df <- ME_df %>% mutate(tot_agg = given1+received1)
+
+ME_df %>% 
+  ggplot(aes(tot_agg, value, fill = status, color = status))+
+  geom_point()+   stat_smooth(method = "lm", se =F)+
+  scale_color_manual(values = viridis::viridis(4))+
+  scale_fill_manual(values = viridis::viridis(4))+         
+  labs(x = "Rate of Aggression",
+       y = "Module eigengene")+
+  facet_wrap(~Module, ncol =4) +newggtheme_with_legends+ 
+  theme(text =element_text(size =10))
 
