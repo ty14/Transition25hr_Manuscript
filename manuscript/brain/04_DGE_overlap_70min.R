@@ -1,4 +1,3 @@
-#social transitions withcontrols. 
 
 # libraries 
 library(limma)
@@ -17,12 +16,10 @@ library(DOSE)
 library(tidyverse)
 grcm38 # mouse genes
 
-my_logFC_threshold = 0.2
-
 #ALL GROUPS 
 my_logFC_threshold = 0.2
 
-limma_list<- readRDS("manuscript/brain/results/limma_PFC70min_ReorganizedGroup.RDS") %>% 
+limma_list<- readRDS("manuscript/brain/results/limma_PFC_ReorganizedGroups_outlierRemoved.RDS") %>% 
   map(~distinct(.)) %>% 
   map(~filter(.,abs(logFC) >= my_logFC_threshold)) %>%
   map(~filter(.,P.Value <0.05)) %>% 
@@ -58,6 +55,18 @@ da_down <- da %>% filter(logFC <= -0.2)%>% arrange(logFC)
 as_down <- as %>% filter(logFC <= -0.2)%>% arrange(logFC)
 dsub_down <- dsub %>% filter(logFC <= -0.2)%>% arrange(logFC)
 
+
+### Number of genes in each cut off 
+#0.2
+adom %>% filter(.,logFC >= .2)%>% filter(P.Value < 0.05) %>% summarise(n = nrow(.)) #309
+adom %>% filter(between(logFC, .2, .5))%>% filter(P.Value < 0.05) %>% summarise(n = nrow(.)) # 276
+adom %>% filter(between(logFC, .5, 1))%>% filter(P.Value < 0.05) %>% summarise(n = nrow(.)) #36 
+adom %>% filter(between(logFC, 1, 3))%>% filter(P.Value < 0.05) %>% summarise(n = nrow(.)) #6
+
+adom %>% filter(.,logFC <= -.2) %>% filter(P.Value < 0.05)%>% summarise(n = nrow(.)) # 322 
+adom %>% filter(between(logFC, -0.5, -0.2)) %>% filter(P.Value < 0.05)%>% summarise(n = nrow(.)) #248
+adom %>% filter(between(logFC, -1, -0.5)) %>% filter(P.Value < 0.05)%>% summarise(n = nrow(.))# 62
+adom %>% filter(between(logFC, -3, -1)) %>% filter(P.Value < 0.05)%>% summarise(n = nrow(.)) # 12
 
 
 
