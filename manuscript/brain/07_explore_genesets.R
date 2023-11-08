@@ -33,14 +33,16 @@ wnt <- c("Fosl1", "Wnt1", "T", "Wnt16", "Wisp1", "Fgf4", "Wnt6",
          "Ccnd3", "Lef1", "Fzd6", "Dixdc1", "Wnt2", "Dkk1", "Fzd4", "Fzd7",
          "Fshb", "Wnt3a", "Tle2", "Fzd5")
 
+
+
 #70 min 
 my_logFC_threshold = 0.2
 
 limma_list<- readRDS("manuscript/brain/results/limma_PFC70min_ReorganizedGroup.RDS") %>% 
   map(~distinct(.)) %>% 
   map(~filter(.,abs(logFC) >= my_logFC_threshold)) %>%
-  map(~filter(.,P.Value <0.05)) %>% 
-  map(~ left_join(., grcm38 %>% dplyr::select(symbol, entrez))) %>% 
+  map(~filter(.,P.Value <0.05)) %>%
+  map(~ left_join(., grcm38 %>% dplyr::select(symbol, entrez))) %>%
   map(~filter(.,!is.na(entrez))) 
 
 dd <- limma_list$desdom
