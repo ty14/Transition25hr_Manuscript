@@ -147,7 +147,7 @@ unique(reactome_sets$gs_name)
 
 #IMMUNE 
 reactome_sets %>% 
-  filter(grepl("immune",gs_name,ignore.case = T)) -> my_gs_sets
+  filter(grepl("DNA",gs_name,ignore.case = T)) -> my_gs_sets
 
 unique(my_gs_sets$gs_name)
 
@@ -198,9 +198,17 @@ as25 %>% filter(symbol %in% cyt_immune$gene_symbol)#17
 
 
 # [5] "REACTOME_DNA_DAMAGE_TELOMERE_STRESS_INDUCED_SENESCENCE"  
+# # "REACTOME_PRC2_METHYLATES_HISTONES_AND_DNA"
+# 11] "REACTOME_DNA_METHYLATION"                                                                       
+# [12] "REACTOME_DNA_REPAIR"
+# # [57] "REACTOME_TRANSCRIPTIONAL_REGULATION_BY_SMALL_RNAS"
+# [27] "REACTOME_NEGATIVE_EPIGENETIC_REGULATION_OF_RRNA_EXPRESSION"                                                    
+# [28] "REACTOME_PIWI_INTERACTING_RNA_PIRNA_BIOGENESIS"                                                                
+# [29] "REACTOME_POSITIVE_EPIGENETIC_REGULATION_OF_RRNA_EXPRESSION" 
+# [1] "REACTOME_EPIGENETIC_REGULATION_OF_GENE_EXPRESSION"  
 #87 genes 
 reactome_sets %>% 
-  filter(grepl("REACTOME_DNA_DAMAGE_TELOMERE_STRESS_INDUCED_SENESCENCE",gs_name,ignore.case = T)) -> cs
+  filter(grepl("REACTOME_DNA_REPAIR" ,gs_name,ignore.case = T)) -> cs
 
 dd %>% filter(symbol %in% cs$gene_symbol)#2
 ds %>% filter(symbol %in% cs$gene_symbol)#8
@@ -586,7 +594,7 @@ unique(wp_sets$gs_name)
 # [399] "WP_MONOAMINE_TRANSPORT"  
 # [426] "WP_NEUROINFLAMMATION"  
 wp_sets %>% 
-  filter(grepl( "WP_CORTICOTROPINRELEASING_HORMONE_SIGNALING_PATHWAY" ,gs_name,ignore.case = T))-> glu
+  filter(grepl( "WP_MAPK_CASCADE" ,gs_name,ignore.case = T))-> glu
 dd %>% filter(symbol %in% glu$gene_symbol)#8
 ds %>% filter(symbol %in% glu$gene_symbol)#18
 ad %>% filter(symbol %in% glu$gene_symbol)#7
@@ -596,10 +604,10 @@ dd25 %>% filter(symbol %in% glu$gene_symbol)#7
 ds25 %>% filter(symbol %in% glu$gene_symbol)#5
 ad25 %>% filter(symbol %in% glu$gene_symbol)#11
 as25 %>% filter(symbol %in% glu$gene_symbol)#5
-
+# ] "WP_BRAINDERIVED_NEUROTROPHIC_FACTOR_BDNF_SIGNALING_PATHWAY"   
 # [427] "WP_NEUROINFLAMMATION_AND_GLUTAMATERGIC_SIGNALING" 
 wp_sets %>% 
-  filter(grepl("WP_NEUROINFLAMMATION_AND_GLUTAMATERGIC_SIGNALING" ,gs_name,ignore.case = T))-> glu
+  filter(grepl( "WP_BRAINDERIVED_NEUROTROPHIC_FACTOR_BDNF_SIGNALING_PATHWAY" ,gs_name,ignore.case = T))-> glu
 dd %>% filter(symbol %in% glu$gene_symbol)#8
 ds %>% filter(symbol %in% glu$gene_symbol)#18
 ad %>% filter(symbol %in% glu$gene_symbol)#7
@@ -665,11 +673,17 @@ as25 %>% filter(symbol %in% ser$gene_symbol)#5
 msigdbr(species = "Mus musculus", subcategory ='GO:BP' ) -> bp_sets
 unique(glu$gs_name)
 #GLUTaMATE
-# [25] "GOBP_SYNAPTIC_TRANSMISSION_GLUTAMATERGIC" 
-
+# "GOBP_SYNAPTIC_SIGNALING"
+# # [25] "GOBP_SYNAPTIC_TRANSMISSION_GLUTAMATERGIC" 
+# [3] "GOBP_REGULATION_OF_LONG_TERM_NEURONAL_SYNAPTIC_PLASTICITY"         
+# [4] "GOBP_REGULATION_OF_NEURONAL_SYNAPTIC_PLASTICITY"                   
+# [5] "GOBP_REGULATION_OF_SHORT_TERM_NEURONAL_SYNAPTIC_PLASTICITY"        
+# [6] "GOBP_REGULATION_OF_SYNAPSE_STRUCTURAL_PLASTICITY"                  
+# [7] "GOBP_REGULATION_OF_SYNAPTIC_PLASTICITY"                            
+# # > 
 
 bp_sets %>% 
-  filter(grepl("GOBP_SYNAPTIC_TRANSMISSION_GLUTAMATERGIC" ,gs_name,ignore.case = T))-> glu
+  filter(grepl("GOBP_SYNAPTIC_SIGNALING" ,gs_name,ignore.case = T))-> glu
 dd %>% filter(symbol %in% glu$gene_symbol)#8
 ds %>% filter(symbol %in% glu$gene_symbol)#18
 ad %>% filter(symbol %in% glu$gene_symbol)#7

@@ -42,10 +42,10 @@ msigdbr(species = "Mus musculus", subcategory ="CP:REACTOME") -> reactome_sets
 msigdbr(species = "Mus musculus", category ="H") -> hallmark_sets
 msigdbr(species = "Mus musculus", subcategory ='CP:WIKIPATHWAYS' ) -> wp_sets
 ######2. Energy
-# reactome_sets %>%
-#   filter(grepl("REACTOME_RESPIRATORY_ELECTRON_TRANSPORT" ,gs_name,ignore.case = T)) %>%
-#   select(gene_symbol) %>%  as_tibble() %>%
-#   .$gene_symbol -> enx
+reactome_sets %>%
+  filter(grepl("REACTOME_THE_CITRIC_ACID_TCA_CYCLE_AND_RESPIRATORY_ELECTRON_TRANSPORT" ,gs_name,ignore.case = T)) %>%
+  select(gene_symbol) %>%  as_tibble() %>%
+  .$gene_symbol -> enx
 # enx_names <- c("Respiratory Electron Transport Chain Gene Set")
 
 # msigdbr(species = "Mus musculus", subcategory ="GO:BP") -> bp_sets
@@ -264,9 +264,9 @@ EnhancedVolcano(df,
                 labCol = "black",
                 labSize = 2.1)+
   annotate("text", x = 0.8, y = 4.4,color = "purple4" , size = 3,
-           label =glue::glue("Relatively Upregulated in DES", "\n", "{my_texts[3,4]}"))+
+           label =glue::glue("Relatively Upregulated in DES", "\n", "{my_texts[2,4]}"))+
   annotate("text", x = -0.8, y = 4.4,color = "orange" , size = 3,
-           label = glue::glue("Relatively Upregulated in SUB","\n", "{my_texts[2,4]}"))+
+           label = glue::glue("Relatively Upregulated in SUB","\n", "{my_texts[3,4]}"))+
   scale_x_continuous(limits = c(-1.5,1.5),breaks = c(-1.5,-1,-0.5,0,0.5,1,1.5))+
   scale_y_continuous(limits = c(-0.1,4.8),breaks = c(0,1,2,3,4),expand=expansion(mult=c(0.0005,0.0)))+
   theme_bw(base_size = 7)+
@@ -336,9 +336,9 @@ EnhancedVolcano(df,
                 labCol = "black",
                 labSize = 2.1)+
   annotate("text", x = 0.8, y = 4.4,color = "purple4" , size = 3,
-           label =glue::glue("Relatively Upregulated in ASC", "\n", "{my_texts[3,4]}"))+
+           label =glue::glue("Relatively Upregulated in ASC", "\n", "{my_texts[2,4]}"))+
   annotate("text", x = -0.8, y = 4.4,color = "orange" , size = 3,
-           label = glue::glue("Relatively Upregulated in DOM","\n", "{my_texts[2,4]}"))+
+           label = glue::glue("Relatively Upregulated in DOM","\n", "{my_texts[3,4]}"))+
   scale_x_continuous(limits = c(-1.5,1.5),breaks = c(-1.5,-1,-0.5,0,0.5,1,1.5))+
   scale_y_continuous(limits = c(-0.1,4.8),breaks = c(0,1,2,3,4),expand=expansion(mult=c(0.0005,0.0)))+
   theme_bw(base_size = 7)+
@@ -408,9 +408,9 @@ EnhancedVolcano(df,
                 labCol = "black",
                 labSize = 2.1)+
   annotate("text", x = 0.8, y = 4.4,color = "purple4" , size = 3,
-           label =glue::glue("Relatively Upregulated in ASC", "\n", "{my_texts[3,4]}"))+
+           label =glue::glue("Relatively Upregulated in ASC", "\n", "{my_texts[2,4]}"))+
   annotate("text", x = -0.8, y = 4.4,color = "orange" , size = 3,
-           label = glue::glue("Relatively Upregulated in SUB","\n", "{my_texts[2,4]}"))+
+           label = glue::glue("Relatively Upregulated in SUB","\n", "{my_texts[3,4]}"))+
   scale_x_continuous(limits = c(-1.5,1.5),breaks = c(-1.5,-1,-0.5,0,0.5,1,1.5))+
   scale_y_continuous(limits = c(-0.1,4.8),breaks = c(0,1,2,3,4),expand=expansion(mult=c(0.0005,0.0)))+
   theme_bw(base_size = 7)+
@@ -431,7 +431,7 @@ invisible(dev.off())
 #
 # 2.REACTOME_RESPIRATORY_ELECTRON_TRANSPORT
 # REACTOME_THE_CITRIC_ACID_TCA_CYCLE_AND_RESPIRATORY_ELECTRON_TRANSPORT
-# top<- grid::textGrob("Respiratory Electron Transport Gene Set", gp = grid::gpar(fontsize = 20))
+# top<- grid::textGrob("Citric Acid Cycle Gene Set", gp = grid::gpar(fontsize = 20))
 # endo_plot <- gridExtra::grid.arrange(a,b,c,d, ncol =2, top = top)
 # ggsave("manuscript/brain/imgs/Energy_70min.png",endo_plot,height =10, width =10, dpi=600)
 # ggsave("manuscript/brain/imgs/CAC_70min.png",endo_plot,height =10, width =10, dpi=600)
