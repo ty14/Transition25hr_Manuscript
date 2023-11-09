@@ -48,10 +48,10 @@ msigdbr(species = "Mus musculus", subcategory ='CP:WIKIPATHWAYS' ) -> wp_sets
 ######2. Energy
 # REACTOME_RESPIRATORY_ELECTRON_TRANSPORT
 # REACTOME_THE_CITRIC_ACID_TCA_CYCLE_AND_RESPIRATORY_ELECTRON_TRANSPORT
-# reactome_sets %>%
-#   filter(grepl("REACTOME_RESPIRATORY_ELECTRON_TRANSPORT" ,gs_name,ignore.case = T)) %>%
-#   select(gene_symbol) %>%  as_tibble() %>%
-#   .$gene_symbol -> enx
+reactome_sets %>%
+  filter(grepl("REACTOME_THE_CITRIC_ACID_TCA_CYCLE_AND_RESPIRATORY_ELECTRON_TRANSPORT" ,gs_name,ignore.case = T)) %>%
+  select(gene_symbol) %>%  as_tibble() %>%
+  .$gene_symbol -> enx
 # enx_names <- c("Respiratory Electron Transport Chain Gene Set")
 #
 # [2] "GOBP_ATP_METABOLIC_PROCESS"
@@ -115,10 +115,29 @@ msigdbr(species = "Mus musculus", subcategory ='CP:WIKIPATHWAYS' ) -> wp_sets
 # "GOBP_CATECHOLAMINE_SECRETION
 # GOBP_RESPONSE_TO_CATECHOLAMINE
 # GOBP_SYNAPTIC_TRANSMISSION_GLUTAMATERGIC
-bp_sets %>%
-  filter(grepl("GOBP_CATECHOLAMINE_SECRETION",gs_name,ignore.case = T)) %>%
-  select(gene_symbol) %>%  as_tibble() %>%
-  .$gene_symbol -> enx
+# bp_sets %>%
+#   filter(grepl("GOBP_CATECHOLAMINE_SECRETION",gs_name,ignore.case = T)) %>%
+#   select(gene_symbol) %>%  as_tibble() %>%
+#   .$gene_symbol -> enx
+########## add ons
+# 
+# reactome_sets %>%
+#   filter(grepl("REACTOME_DNA_REPAIR",gs_name,ignore.case = T)) %>%
+#   select(gene_symbol) %>%  as_tibble() %>%
+#      .$gene_symbol -> enx
+
+# wp_sets %>%
+#   filter(grepl( "WP_BRAINDERIVED_NEUROTROPHIC_FACTOR_BDNF_SIGNALING_PATHWAY" ,gs_name,ignore.case = T)) %>%
+#   select(gene_symbol) %>%  as_tibble() %>%
+#   .$gene_symbol -> enx
+
+
+# bp_sets %>% 
+#   filter(grepl("GOBP_SYNAPTIC_SIGNALING" ,gs_name,ignore.case = T)) %>% 
+#   select(gene_symbol) %>%  as_tibble() %>%
+#   .$gene_symbol -> enx
+
+
 ###############################
 head(y4a)
 y4a  %>%
@@ -182,9 +201,9 @@ EnhancedVolcano(df,
                 labCol = "black",
                 labSize = 2.1)+
   annotate("text", x = 0.8, y = 4.4,color = "purple4" , size = 3,
-           label =glue::glue("Relatively Upregulated in DES", "\n", "{my_texts[3,4]}"))+
+           label =glue::glue("Relatively Upregulated in DES", "\n", "{my_texts[2,4]}"))+
   annotate("text", x = -0.8, y = 4.4,color = "orange" , size = 3,
-           label = glue::glue("Relatively Upregulated in DOM","\n", "{my_texts[2,4]}"))+
+           label = glue::glue("Relatively Upregulated in DOM","\n", "{my_texts[3,4]}"))+
   scale_x_continuous(limits = c(-1.5,1.5),breaks = c(-1.5,-1,-0.5,0,0.5,1,1.5))+
   scale_y_continuous(limits = c(-0.1,4.8),breaks = c(0,1,2,3,4),expand=expansion(mult=c(0.0005,0.0)))+
   theme_bw(base_size = 7)+
@@ -425,7 +444,7 @@ invisible(dev.off())
 #
 # 2.REACTOME_RESPIRATORY_ELECTRON_TRANSPORT
 # REACTOME_THE_CITRIC_ACID_TCA_CYCLE_AND_RESPIRATORY_ELECTRON_TRANSPORT
- # top<- grid::textGrob("ATP Metabolism", gp = grid::gpar(fontsize = 20))
+ # top<- grid::textGrob("Citric Acid Cycle Gene Set", gp = grid::gpar(fontsize = 20))
  # endo_plot <- gridExtra::grid.arrange(a,b,c,d, ncol =2, top = top)
  # ggsave("manuscript/brain/imgs/Energy_25hr.png",endo_plot,height =10, width =10, dpi=600)
 # ggsave("manuscript/brain/imgs/CAC_25hr.png",endo_plot,height =10, width =10, dpi=600)
@@ -524,6 +543,22 @@ invisible(dev.off())
 # ggsave("manuscript/brain/imgs/ResponsetoCat0min.png",endo_plot,height =10, width =10, dpi =600)
 
 # "GOBP_CATECHOLAMINE_SECRETION
-top<- grid::textGrob("Secretion of Catecholamines", gp = grid::gpar(fontsize = 20))
-endo_plot <- gridExtra::grid.arrange(a,b,c,d, ncol =2, top = top)
-ggsave("manuscript/brain/imgs/SecretionofCat25hr.png",endo_plot,height =10, width =10, dpi =600)
+# top<- grid::textGrob("Secretion of Catecholamines", gp = grid::gpar(fontsize = 20))
+# endo_plot <- gridExtra::grid.arrange(a,b,c,d, ncol =2, top = top)
+# ggsave("manuscript/brain/imgs/SecretionofCat25hr.png",endo_plot,height =10, width =10, dpi =600)
+
+# DNA repair
+# top<- grid::textGrob("DNA repair", gp = grid::gpar(fontsize = 20))
+# endo_plot <- gridExtra::grid.arrange(a,b,c,d, ncol =2, top = top)
+# ggsave("manuscript/brain/imgs/DNARepair25hr.png",endo_plot,height =10, width =10, dpi =600)
+
+# #bdnf
+# top<- grid::textGrob("Bdnf Signaling", gp = grid::gpar(fontsize = 20))
+# endo_plot <- gridExtra::grid.arrange(a,b,c,d, ncol =2, top = top)
+# ggsave("manuscript/brain/imgs/Bdnf25hr.png",endo_plot,height =10, width =10, dpi =600)
+
+#synaptic signaling 
+# top<- grid::textGrob("Synaptic Signaling", gp = grid::gpar(fontsize = 20))
+# endo_plot <- gridExtra::grid.arrange(a,b,c,d, ncol =2, top = top)
+# ggsave("manuscript/brain/imgs/SS25hr.png",endo_plot,height =10, width =10, dpi =600)
+
