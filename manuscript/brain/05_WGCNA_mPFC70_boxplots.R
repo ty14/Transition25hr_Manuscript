@@ -21,7 +21,9 @@ head(ME_df)
 ME_df$Module <- gsub("ME", "", ME_df$Module)
 
 
-
+colnames(ME_df)
+ME_df$condition2 <- ifelse(ME_df$condition1 == "SUB", "SD",ME_df$condition1)
+ME_df$condition2 <- ifelse(ME_df$condition2 == "DOM", "SD",ME_df$condition2)
 
 #boxplot of eigengenes and status 
 source("functions/geom_boxjitter.R")
@@ -30,7 +32,7 @@ source("functions/newggtheme.R")
 
 
 ME_df %>% 
-  ggplot(aes(status, value, fill = status, color = status))+
+  ggplot(aes(condition2, value, fill = condition2, color = condition2))+
   geom_boxjitter(outlier.color = NA, jitter.shape = 21, jitter.color = NA,
                  alpha = 0.3,
                  jitter.height = 0.02, jitter.width = 0.07, errorbar.draw = TRUE,
@@ -43,6 +45,35 @@ ME_df %>%
   facet_wrap(~Module) +newggtheme_with_legends+ 
   theme(legend.position = "none", text =element_text(size =10))
 
+
+library(lmerTest)
+
+lm.df <- ME_df %>% pivot_wider(names_from = Module, values_from = value)
+lm.df$condition3 <- factor(lm.df$condition2, c("DES", "SD", "ASC"))
+colnames(lm.df)
+#DES: grey60 
+g6 <- lmer(grey60 ~condition2 +(1|batch), data = lm.df)
+summary(g6)
+
+g62 <- lmer(grey60 ~condition3 +(1|batch), data = lm.df)
+summary(g62)
+
+# TRN:  red, pink, turquoise, yellow
+ME_df %>% filter(Module %in% c('grey60', "blue", "green")) %>% 
+  ggplot(aes(condition2, value, fill = condition2, color = condition2))+
+  geom_boxjitter(outlier.color = NA, jitter.shape = 21, jitter.color = NA,
+                 alpha = 0.3,
+                 jitter.height = 0.02, jitter.width = 0.07, errorbar.draw = TRUE,
+                 position = position_dodge(0.85)) +
+  # facet_wrap(~Module, ncol =5)+
+  scale_color_manual(values = viridis::viridis(4))+
+  scale_fill_manual(values = viridis::viridis(4))+         
+  labs(x = "Social condition",
+       y = "Module eigengene")+
+  facet_wrap(~Module, ncol =4) +newggtheme_with_legends+ 
+  theme(legend.position = "none", text =element_text(size =10))
+
+# ASC:  blue, green, diff from SD. 
 
 
 

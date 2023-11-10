@@ -17,7 +17,7 @@ amy1 <- coldata %>% full_join(fix)
 coldatax <- amy1[c(1:15,17:23),]
 
 
-b2.5.1
+# b2.5.1
 
 
 MEs <- readRDS("manuscript/brain/results/WGCNA_MEs_mPFC25_Power4.RDS")
@@ -35,14 +35,17 @@ ME_df$Module <- gsub("ME", "", ME_df$Module)
 
 table(ME_df$condition1)
 
+ME_df$condition2 <- ifelse(ME_df$condition1 == "SUB", "SD", ME_df$condition1)
+ME_df$condition2 <- ifelse(ME_df$condition2 == "DOM", "SD", ME_df$condition2)
+
 #boxplot of eigengenes and status 
 source("functions/geom_boxjitter.R")
 source("functions/newggtheme.R")
 
 
 
-ME_df %>% 
-  ggplot(aes(status, value, fill = status, color = status))+
+ME_df %>% filter(Module %in% c("purple", "salmon")) %>% 
+  ggplot(aes(condition2, value, fill = condition2, color = condition2))+
   geom_boxjitter(outlier.color = NA, jitter.shape = 21, jitter.color = NA,
                  alpha = 0.3,
                  jitter.height = 0.02, jitter.width = 0.07, errorbar.draw = TRUE,
@@ -56,8 +59,19 @@ ME_df %>%
   theme(legend.position = "none", text =element_text(size =10))
 
 
+# TRN: black, blue, pink, purple, red, salmon,turquoise
+lm.df <- ME_df %>% pivot_wider(names_from = Module, values_from = value)
+lm.df$condition3 <- factor(lm.df$condition2, c("DES", "SD", "ASC"))
+colnames(lm.df)
+#DES: grey60 
+g6 <- lmer(turquoise ~condition2 +(1|batch), data = lm.df)
+summary(g6)
 
+g62 <- lmer(turquoise~condition3 +(1|batch), data = lm.df)
+summary(g62)
 
+#purple asc, 
+#salmon des
 ME_df %>% 
   ggplot(aes(CORT, value, fill = status, color = status))+
   geom_point()+   stat_smooth(method = "lm", se =F)+

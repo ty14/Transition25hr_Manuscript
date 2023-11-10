@@ -147,7 +147,7 @@ unique(reactome_sets$gs_name)
 
 #IMMUNE 
 reactome_sets %>% 
-  filter(grepl("DNA",gs_name,ignore.case = T)) -> my_gs_sets
+  filter(grepl("immune",gs_name,ignore.case = T)) -> my_gs_sets
 
 unique(my_gs_sets$gs_name)
 
