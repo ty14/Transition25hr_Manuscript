@@ -33,7 +33,18 @@ wnt <- c("Fosl1", "Wnt1", "T", "Wnt16", "Wisp1", "Fgf4", "Wnt6",
          "Ccnd3", "Lef1", "Fzd6", "Dixdc1", "Wnt2", "Dkk1", "Fzd4", "Fzd7",
          "Fshb", "Wnt3a", "Tle2", "Fzd5")
 
+ser <- read_csv("manuscript/brain/gene_sets/Serotonergic_genes.csv")
+ head(ser)
+ser %>%
+as_tibble() %>%.$symbol -> serx
+serx <- str_to_title(serx)  
 
+
+ser <- read_csv("manuscript/brain/gene_sets/Dopaminergic_genes.csv")
+head(ser)
+ser %>%
+  as_tibble() %>%.$symbol -> serx
+serx <- str_to_title(serx)  
 
 #70 min 
 my_logFC_threshold = 0.2
@@ -82,6 +93,14 @@ as %>% filter(symbol %in% wnt)#3
 
 
 
+dd %>% filter(symbol %in% serx)#0
+ds %>% filter(symbol %in% serx)#2
+ad %>% filter(symbol %in% serx)#1
+as %>% filter(symbol %in% serx)#2
+
+
+
+
 #25 hour
 my_logFC_threshold = 0.2
 
@@ -127,6 +146,10 @@ ds25 %>% filter(symbol %in% wnt)#4
 ad25 %>% filter(symbol %in% wnt)#1 
 as25 %>% filter(symbol %in% wnt)#2
 
+dd25 %>% filter(symbol %in% serx)#0
+ds25 %>% filter(symbol %in% serx)#2
+ad25 %>% filter(symbol %in% serx)#1
+as25 %>% filter(symbol %in% serx)#2
 
 
 

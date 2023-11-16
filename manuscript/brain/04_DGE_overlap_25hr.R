@@ -42,6 +42,10 @@ as <- limma_list$ascsub
 
 dsub <- limma_list$dessub
 
+xx <- adom %>% rbind(dd,as,dsub)
+
+all <- unique(xx$entrez)
+
 
 #upreg
 adom_up <- adom %>% filter(logFC >= 0.2) %>% arrange(-logFC)
@@ -118,3 +122,50 @@ t_down25 <- st_down25$.[st_down25$. %in% dt_down25$.]%>% as.data.frame()
 mat <- matrix(c(8,0,0,11),ncol=2)
 # Perform chi-squared test
 chi_square <- chisq.test(mat)
+
+
+
+colnames(dt_up25)[1]<- "symbol"
+dt_up <- dt_up25 %>% mutate(regulated = "up") %>% mutate(condition = "TRN vs DOM") %>% mutate(time = 25)
+
+colnames(dt_down25)[1]<- "symbol"
+dt_down <- dt_down25 %>% mutate(regulated = "down") %>% mutate(condition = "TRN vs DOM") %>% mutate(time =25 )
+
+dt <- dt_up %>%  rbind(dt_down)
+
+df_dd <- dd %>% select(symbol, dd_logFC= logFC, dd_pv= P.Value) %>%
+  mutate(time = 25) %>%  filter(symbol %in% dt$symbol) %>% filter(symbol != "")
+df_adom <- adom %>% select(symbol, adom_logFC= logFC, adom_pv= P.Value) %>%
+  mutate(time = 25) %>% filter(symbol %in% dt$symbol)%>% filter(symbol != "")
+
+dd_dt <- df_dd %>% full_join(df_adom)
+
+dd_dt25 <- dd_dt %>% full_join(dt) %>% na.omit(. )
+
+
+
+colnames(st_up25)[1]<- "symbol"
+st_up <- st_up25 %>% mutate(regulated = "up") %>% mutate(condition = "TRN vs SUB") %>% mutate(time = 25)
+
+colnames(st_down25)[1]<- "symbol"
+st_down <- st_down25 %>% mutate(regulated = "down") %>% mutate(condition = "TRN vs SUB") %>% mutate(time = 25)
+
+st <- st_up %>%  rbind(st_down)
+
+df_as <- as %>% select(symbol, as_logFC= logFC, as_pv= P.Value) %>%
+  mutate(time = 25) %>%  filter(symbol %in% st$symbol)
+df_ds<- dsub %>% select(symbol, ds_logFC= logFC, ds_pv= P.Value) %>%
+  mutate(time = 25) %>% filter(symbol %in% st$symbol)
+
+dd_st <- df_as %>% full_join(df_ds)
+
+dd_st25 <- dd_st %>% full_join(st)
+
+
+
+# source("manuscript/brain/04DEG-overlap_70min.R")
+dt_all <- dd_dt70 %>% rbind(dd_dt25)
+write.csv(dt_all,"manuscript/brain/results_tables/TRNgenesvsDOM_bothtimepoints.csv", row.names = F)
+
+st_all <- dd_st70 %>% rbind(dd_st25)
+write.csv(st_all,"manuscript/brain/results_tables/TRNgenesvsSUB_bothtimepoints.csv", row.names = F)

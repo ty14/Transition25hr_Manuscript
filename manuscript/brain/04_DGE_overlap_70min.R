@@ -19,25 +19,27 @@ grcm38 # mouse genes
 #ALL GROUPS 
 my_logFC_threshold = 0.2
 
-limma_list<- readRDS("manuscript/brain/results/limma_PFC_ReorganizedGroups_outlierRemoved.RDS") %>% 
+limma_list<- readRDS("manuscript/brain/results/limma_PFC70min_ReorganizedGroup.RDS") %>% 
   map(~distinct(.)) %>% 
   map(~filter(.,abs(logFC) >= my_logFC_threshold)) %>%
   map(~filter(.,P.Value <0.05)) %>% 
   map(~ left_join(., grcm38 %>% dplyr::select(symbol, entrez))) %>% 
   map(~filter(.,!is.na(entrez))) 
 
-adom <- limma_list$ascdom
+adom <- limma_list$ascdom #666
 
-doms <- limma_list$domsub
+dd <- limma_list$desdom #763
 
-dd <- limma_list$desdom
 
-da <- limma_list$desasc
+as <- limma_list$ascsub #807
 
-as <- limma_list$ascsub
+dsub <- limma_list$dessub #1580
 
-dsub <- limma_list$dessub
 
+
+xx <- adom %>% rbind(dd,as,dsub)
+
+all <- unique(xx$entrez)
 
 #upreg
 adom_up <- adom %>% filter(logFC >= 0.2) %>% arrange(-logFC)
@@ -83,8 +85,9 @@ UpSetR::upset(fromList(listInput), nsets = 4, order.by = "freq", keep.order = F)
 
 #getting overlap genes with for dom and trn groups 
 dt_up <- adom_up$symbol[adom_up$symbol %in% dd_up$symbol] %>% as.data.frame()
-dt_down %>% head(.,20)
 dt_down <- adom_down$symbol[adom_down$symbol %in% dd_down$symbol]%>% as.data.frame()
+
+
 
 
 #significant test
@@ -126,3 +129,41 @@ t_down <- st_down$.[st_down$. %in% dt_down$.]%>% as.data.frame()
 mat <- matrix(c(8,0,0,11),ncol=2)
 # Perform chi-squared test
 chi_square <- chisq.test(mat)
+
+
+
+colnames(dt_up)[1]<- "symbol"
+dt_up <- dt_up %>% mutate(regulated = "up") %>% mutate(condition = "TRN vs DOM") %>% mutate(time = 70)
+
+colnames(dt_down)[1]<- "symbol"
+dt_down <- dt_down %>% mutate(regulated = "down") %>% mutate(condition = "TRN vs DOM") %>% mutate(time = 70)
+
+dt <- dt_up %>%  rbind(dt_down)
+
+df_dd <- dd %>% select(symbol, dd_logFC= logFC, dd_pv= P.Value) %>%
+  mutate(time = 70) %>%  filter(symbol %in% dt$symbol)
+df_adom <- adom %>% select(symbol, adom_logFC= logFC, adom_pv= P.Value) %>%
+  mutate(time = 70) %>% filter(symbol %in% dt$symbol)
+
+dd_dt <- df_dd %>% full_join(df_adom)
+
+dd_dt70 <- dd_dt %>% full_join(dt)
+
+
+
+colnames(st_up)[1]<- "symbol"
+st_up <- st_up %>% mutate(regulated = "up") %>% mutate(condition = "TRN vs SUB") %>% mutate(time = 70)
+
+colnames(st_down)[1]<- "symbol"
+st_down <- st_down %>% mutate(regulated = "down") %>% mutate(condition = "TRN vs SUB") %>% mutate(time = 70)
+
+st <- st_up %>%  rbind(st_down)
+
+df_as <- as %>% select(symbol, as_logFC= logFC, as_pv= P.Value) %>%
+  mutate(time = 70) %>%  filter(symbol %in% st$symbol)
+df_ds<- dsub %>% select(symbol, ds_logFC= logFC, ds_pv= P.Value) %>%
+  mutate(time = 70) %>% filter(symbol %in% st$symbol)
+
+dd_st <- df_as %>% full_join(df_ds)
+
+dd_st70 <- dd_st %>% full_join(st)
