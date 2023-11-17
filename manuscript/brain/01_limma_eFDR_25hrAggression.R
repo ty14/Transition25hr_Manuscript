@@ -12,11 +12,15 @@ library(tidyverse)
 
 
 # Expression values
-dlNorm <-  read.csv("brain/PFC_counts.csv", row.names = 1)
-#remove zeros
-dlNorm <- dlNorm[apply(dlNorm[], 1, function(x) !all(x==0)),]
-#trim sample ids
-colnames(dlNorm)[c(1:67)] <- substr(colnames(dlNorm)[c(1:67)], 7, 13)
+a_countdata <- read_csv("brain/PFC_25hcounts.csv")
+a_countdata$X -> nrows
+a_count <- a_countdata[,-1]
+a_count <- a_count[,c(1:19,21:24)]
+
+dlNorm <-as.data.frame(a_count)
+row.names(dlNorm) <- nrows
+
+colnames(dlNorm) <- substr(colnames(dlNorm),6,11)
 
 #Group traits
 #Getting metadata ready 
@@ -24,13 +28,28 @@ coldata <- read_csv("manuscript/brain/results_tables/coldata_ALLxAGG.csv")
 head(coldata)
 str(coldata)
 
-coldata <- coldata %>% filter(time == 70)
-coldata <- coldata[c(1:25,27:29),]
-coldata <- coldata %>% column_to_rownames(., var ='SampleID')
+coldata1 <- coldata %>% filter(time == 25)
+
+
+# fix sub values
+fix <- coldata1 %>% filter(condition1 == "SUB")
+
+fix$CORT <- ifelse(is.na(fix$CORT), mean(fix$CORT, na.rm = T), fix$CORT)
+fix$wt_d8 <- ifelse(is.na(fix$wt_d8), mean(fix$wt_d8, na.rm = T), fix$wt_d8)
+fix$post.given1 <- ifelse(is.na(fix$post.given1), mean(fix$post.given1, na.rm = T), fix$post.given1)
+fix$post.received1 <- ifelse(is.na(fix$post.received1), mean(fix$post.received1, na.rm = T), fix$post.received1)
+coldata1  <- coldata1  %>% full_join(fix)
+coldata1  <- coldata1[c(1:15,17:24),]
+
+#b1.2.1 outlier DES
+coldata1 <- coldata1 %>% column_to_rownames(., var ='SampleID')
+table(coldata1$condition1)
+
+
 
 #check before normalizing 
-dlNorm<- dlNorm[, rownames(coldata)]
-all(rownames(coldata) == colnames(dlNorm))
+dlNorm<- dlNorm[,rownames(coldata1)]
+all(rownames(coldata1) == colnames(dlNorm))
 
 #normalize and filter with all groups 
 dlNorm <- dlNorm[!is.na(rowSums(dlNorm)),]
@@ -38,7 +57,7 @@ dlNorm <- dlNorm[!is.na(rowSums(dlNorm)),]
 d = apply(dlNorm, 2, as.numeric)
 dim(d)
 
-d0= DGEList(d, group = coldata$condition1)
+d0= DGEList(d, group = coldata1$condition1)
 dim(d0)
 rownames(d0) <- rownames(dlNorm)
 
@@ -49,7 +68,7 @@ cutoff <- 5
 drop <- which(apply(cpm(d0), 1, max) < cutoff)
 dge.dl <- d0[-drop,]
 dim(dge.dl)
-# 14734    28
+# [1] 15015    23
 
 # Now take out groups that you want
 #DOMs first 
@@ -61,7 +80,7 @@ dge.dl_dom$samples$group
 dge.dl<- dge.dl_dom
 dge.dl$samples$group
 
-coldata  %>% 
+coldata1  %>% 
   dplyr::select(condition1,CORT, post.received1) -> var_info  
 
 
@@ -77,7 +96,7 @@ var_info$CORT%>%
 
 
 var_info$post.received1 %>% 
-  scale %>% 
+  scale%>% 
   as.numeric -> agg.dl 
 
 
@@ -97,7 +116,7 @@ vfit.dl = lmFit(v.dl, design.dl)
 efit.dl = eBayes(vfit.dl)
 p.dl.limma = efit.dl[["p.value"]]
 
-saveRDS(v.dl, "manuscript/brain/results/limma_vdl_mPFC_CORT_AGGREC.RDS")
+saveRDS(v.dl, "manuscript/brain/results/limma_vdl_mPFC_CORT_AGGREC25.RDS")
 
 
 
@@ -155,11 +174,11 @@ sum(duplicated(row.names(efit.dl$coefficients)))
 
 
 #save eFDR values 
-saveRDS(q.dl,("manuscript/brain/results/limma_vdl_cutoff5_2000_tworand_mPFC_CORT_AGGREC.RDS"))
+saveRDS(q.dl,("manuscript/brain/results/limma_vdl_cutoff5_2000_tworand_mPFC25_CORT_AGGREC.RDS"))
 
 
 #########  READ IN RESULTS
-q.dl <- readRDS("manuscript/brain/results/limma_vdl_cutoff5_2000_tworand_mPFC_CORT_AGGREC.RDS")
+q.dl <- readRDS("manuscript/brain/results/limma_vdl_cutoff5_2000_tworand_mPFC25_CORT_AGGREC.RDS")
 
 
 ##### Analysis pulling genes out for each contrast 
@@ -189,11 +208,11 @@ topTable(tmp3, sort.by = "P", n = Inf) %>%
   dplyr::select(symbol,logFC,P.Value,adj.P.Val) -> limma_list$cort_aggrec
 
 
-saveRDS(limma_list,"manuscript/brain/results/limma_mPFC_CORT_AGGREC.RDS")
+saveRDS(limma_list,"manuscript/brain/results/limma_mPFC25_CORT_AGGREC.RDS")
 
 
 #quick look at number of genes
-limma_list <- readRDS("manuscript/brain/results/limma_mPFC_CORT_AGGREC.RDS") %>% 
+limma_list <- readRDS("manuscript/brain/results/limma_mPFC25_CORT_AGGREC.RDS") %>% 
   map(~distinct(.)) %>% 
   map(~filter(.,abs(logFC) >= 0.2)) %>%
   map(~filter(.,P.Value <0.05)) %>%
@@ -208,15 +227,20 @@ limma_list %>% map(~filter(., P.Value<0.05)) %>%
 limma_list %>% map(~hist(.$logFC))
 
 
-
-###### now agg given 
+# 
+# ###### now agg given 
+# 
 
 # Expression values
-dlNorm <-  read.csv("brain/PFC_counts.csv", row.names = 1)
-#remove zeros
-dlNorm <- dlNorm[apply(dlNorm[], 1, function(x) !all(x==0)),]
-#trim sample ids
-colnames(dlNorm)[c(1:67)] <- substr(colnames(dlNorm)[c(1:67)], 7, 13)
+a_countdata <- read_csv("brain/PFC_25hcounts.csv")
+a_countdata$X -> nrows
+a_count <- a_countdata[,-1]
+a_count <- a_count[,c(1:19,21:24)]
+
+dlNorm <-as.data.frame(a_count)
+row.names(dlNorm) <- nrows
+
+colnames(dlNorm) <- substr(colnames(dlNorm),6,11)
 
 #Group traits
 #Getting metadata ready 
@@ -224,13 +248,28 @@ coldata <- read_csv("manuscript/brain/results_tables/coldata_ALLxAGG.csv")
 head(coldata)
 str(coldata)
 
-coldata <- coldata %>% filter(time == 70)
-coldata <- coldata[c(1:25,27:29),]
-coldata <- coldata %>% column_to_rownames(., var ='SampleID')
+coldata1 <- coldata %>% filter(time == 25)
+
+
+# fix sub values
+fix <- coldata1 %>% filter(condition1 == "SUB")
+
+fix$CORT <- ifelse(is.na(fix$CORT), mean(fix$CORT, na.rm = T), fix$CORT)
+fix$wt_d8 <- ifelse(is.na(fix$wt_d8), mean(fix$wt_d8, na.rm = T), fix$wt_d8)
+fix$post.given1 <- ifelse(is.na(fix$post.given1), mean(fix$post.given1, na.rm = T), fix$post.given1)
+fix$post.received1 <- ifelse(is.na(fix$post.received1), mean(fix$post.received1, na.rm = T), fix$post.received1)
+coldata1  <- coldata1  %>% full_join(fix)
+coldata1  <- coldata1[c(1:15,17:24),]
+
+#b1.2.1 outlier DES
+coldata1 <- coldata1 %>% column_to_rownames(., var ='SampleID')
+table(coldata1$condition1)
+
+
 
 #check before normalizing 
-dlNorm<- dlNorm[, rownames(coldata)]
-all(rownames(coldata) == colnames(dlNorm))
+dlNorm<- dlNorm[,rownames(coldata1)]
+all(rownames(coldata1) == colnames(dlNorm))
 
 #normalize and filter with all groups 
 dlNorm <- dlNorm[!is.na(rowSums(dlNorm)),]
@@ -238,7 +277,7 @@ dlNorm <- dlNorm[!is.na(rowSums(dlNorm)),]
 d = apply(dlNorm, 2, as.numeric)
 dim(d)
 
-d0= DGEList(d, group = coldata$condition1)
+d0= DGEList(d, group = coldata1$condition1)
 dim(d0)
 rownames(d0) <- rownames(dlNorm)
 
@@ -249,7 +288,7 @@ cutoff <- 5
 drop <- which(apply(cpm(d0), 1, max) < cutoff)
 dge.dl <- d0[-drop,]
 dim(dge.dl)
-# 14734    28
+# [1] 15015    23
 
 # Now take out groups that you want
 #DOMs first 
@@ -261,8 +300,8 @@ dge.dl_dom$samples$group
 dge.dl<- dge.dl_dom
 dge.dl$samples$group
 
-coldata  %>% 
-  dplyr::select(condition1,CORT, post.given1) -> var_info  
+coldata1  %>%
+  dplyr::select(condition1,CORT, post.given1) -> var_info
 
 
 dlNorm<- dlNorm[, rownames(var_info)]
@@ -271,14 +310,14 @@ all(rownames(var_info) == colnames(dlNorm)) #check
 ##get groups I want
 
 
-var_info$CORT%>% 
-  scale %>% 
-  as.numeric -> cort.dl 
+var_info$CORT%>%
+  scale %>%
+  as.numeric -> cort.dl
 
 
-var_info$post.given1 %>% 
-  scale %>% 
-  as.numeric -> agg.dl 
+var_info$post.given1 %>%
+  scale %>%
+  as.numeric -> agg.dl
 
 
 design.dl <- model.matrix(~cort.dl*agg.dl)
@@ -297,7 +336,7 @@ vfit.dl = lmFit(v.dl, design.dl)
 efit.dl = eBayes(vfit.dl)
 p.dl.limma = efit.dl[["p.value"]]
 
-saveRDS(v.dl, "manuscript/brain/results/limma_vdl_mPFC_CORT_AGGiven.RDS")
+saveRDS(v.dl, "manuscript/brain/results/limma_vdl_mPFC_CORT_AGGiven25.RDS")
 
 
 
@@ -314,23 +353,23 @@ p.dl.rand.t = vector('list',length = R)
 
 for( g in 1 : R){
   print(paste("Starting on Permutation", g))
-  
+
   # Randomize the traits
-  
+
   agg.dl.rand = sample(agg.dl)
   cort.dl.rand = sample(cort.dl)
-  
+
   # Model
-  design.dl.rand = model.matrix(~cort.dl.rand*agg.dl.rand)
+  design.dl.rand = model.matrix(~agg.dl.rand*cort.dl.rand)
   colnames(design.dl.rand) <- mycolnames
-  
+
   # Calculate p-values based on randomized traits
   # Calculate p-values based on randomized traits
   v.dl.rand = voom(dge.dl, design.dl.rand, plot = F)
   vfit.dl.rand = lmFit(v.dl.rand, design.dl.rand)
   efit.dl.rand = eBayes(vfit.dl.rand)
   p.dl.rand[[g]] = efit.dl.rand[["p.value"]]
-  
+
 }
 
 
@@ -352,14 +391,12 @@ efit.dl[["p.value"]] <- q.dl
 row.names(q.dl) <- NULL
 sum(duplicated(row.names(efit.dl$coefficients)))
 
-
-
 #save eFDR values 
-saveRDS(q.dl,("manuscript/brain/results/limma_vdl_cutoff5_2000_tworand_mPFC_CORT_AGGiven.RDS"))
+saveRDS(q.dl,("manuscript/brain/results/limma_vdl_cutoff5_2000_tworand_mPFC25_CORT_AGGiven.RDS"))
 
 
 #########  READ IN RESULTS
-q.dl <- readRDS("manuscript/brain/results/limma_vdl_cutoff5_2000_tworand_mPFC_CORT_AGGiven.RDS")
+q.dl <- readRDS("manuscript/brain/results/limma_vdl_cutoff5_2000_tworand_mPFC25_CORT_AGGiven.RDS")
 
 
 ##### Analysis pulling genes out for each contrast 
@@ -379,21 +416,21 @@ topTable(tmp2, sort.by = "P", n = Inf) %>%
   rownames_to_column('ensgene') %>% 
   left_join(grcm38) %>%
   filter(!is.na(symbol)) %>% 
-  dplyr::select(symbol,logFC,P.Value,adj.P.Val)  -> limma_list$agiven
+  dplyr::select(symbol,logFC,P.Value,adj.P.Val)  -> limma_list$aggiven
 
 
 topTable(tmp3, sort.by = "P", n = Inf) %>% 
   rownames_to_column('ensgene') %>% 
   left_join(grcm38) %>%
   filter(!is.na(symbol)) %>% 
-  dplyr::select(symbol,logFC,P.Value,adj.P.Val) -> limma_list$cort_agiven
+  dplyr::select(symbol,logFC,P.Value,adj.P.Val) -> limma_list$cort_aggiven
 
 
-saveRDS(limma_list,"manuscript/brain/results/limma_mPFC_CORT_AGGgiven.RDS")
+saveRDS(limma_list,"manuscript/brain/results/limma_mPFC25_CORT_AGGiven.RDS")
 
 
 #quick look at number of genes
-limma_list <- readRDS("manuscript/brain/results/limma_mPFC_CORT_AGGgiven.RDS") %>% 
+limma_list <- readRDS("manuscript/brain/results/limma_mPFC25_CORT_AGGiven.RDS") %>% 
   map(~distinct(.)) %>% 
   map(~filter(.,abs(logFC) >= 0.2)) %>%
   map(~filter(.,P.Value <0.05)) %>%
@@ -408,6 +445,3 @@ limma_list %>% map(~filter(., P.Value<0.05)) %>%
 limma_list %>% map(~hist(.$logFC))
 
 
-
-x <- limma_list$cort_agiven
-x %>% arrange(logFC) %>%  head(.,10)

@@ -142,9 +142,13 @@ l.aggr.df$post_idbatch <- gsub("C", "", l.aggr.df$post_idbatch)
 
 df <- read_csv("manuscript/brain/results_tables/coldata_ALL.csv")
 head(df)
+dfx <- df %>% filter(time == 25)
+dfx$SampleID
 
 ad <- l.aggr.df %>% select(8:10)
 adx <- df %>% full_join(ad)
-data <- adx[1:51,]
+data <- adx[1:52,]
 
+datax  <- data %>% filter(time == 25)
+datax$SampleID
 write.csv(data, "manuscript/brain/results_tables/coldata_ALLxAGG.csv", row.names =F)
