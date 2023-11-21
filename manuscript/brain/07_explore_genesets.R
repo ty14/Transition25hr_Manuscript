@@ -46,6 +46,12 @@ ser %>%
   as_tibble() %>%.$symbol -> serx
 serx <- str_to_title(serx)  
 
+
+mt <- read_csv("manuscript/brain/gene_sets/Mouse.MitoCarta3.csv")
+head(mt)
+mt %>%
+  as_tibble() %>%.$Symbol -> mtx
+
 #70 min 
 my_logFC_threshold = 0.2
 
@@ -98,7 +104,10 @@ ds %>% filter(symbol %in% serx)#2
 ad %>% filter(symbol %in% serx)#1
 as %>% filter(symbol %in% serx)#2
 
-
+dd %>% filter(symbol %in% mtx)#57
+ds %>% filter(symbol %in% mtx)#101
+ad %>% filter(symbol %in% mtx)#63
+as %>% filter(symbol %in% mtx)#66
 
 
 #25 hour
@@ -120,6 +129,10 @@ ad25 <- limma_list$ascdom
 as25 <- limma_list$ascsub
 
 
+dd25 %>% filter(symbol %in% mtx)#22
+ds25 %>% filter(symbol %in% mtx)#53
+ad25 %>% filter(symbol %in% mtx)#37
+as25 %>% filter(symbol %in% mtx)#53
 
 dd25 %>% filter(symbol %in% chol)#0
 ds25 %>% filter(symbol %in% chol)#4
@@ -277,7 +290,7 @@ as25 %>% filter(symbol %in% oxi$gene_symbol)#2
 
  
 reactome_sets %>% 
-  filter(grepl("metabolism",gs_name,ignore.case = T)) -> my_gs_sets
+  filter(grepl("oxida",gs_name,ignore.case = T)) -> my_gs_sets
 unique(my_gs_sets$gs_name)
 #to many 
 # [47] "REACTOME_METABOLISM_OF_RNA"      
@@ -389,7 +402,7 @@ unique(hallmark_sets$gs_name)
 # "HALLMARK_ANDROGEN_RESPONSE" 
     
 hallmark_sets %>% 
-  filter(grepl("HALLMARK_ANDROGEN_RESPONSE",gs_name,ignore.case = T)) -> ando # 126
+  filter(grepl("HALLMARK_OXIDATIVE_PHOSPHORYLATION",gs_name,ignore.case = T)) -> ando # 126
 
 
 dd %>% filter(symbol %in% ando$gene_symbol)#8
@@ -401,7 +414,6 @@ dd25 %>% filter(symbol %in% ando$gene_symbol)#2
 ds25 %>% filter(symbol %in% ando$gene_symbol)#2
 ad25 %>% filter(symbol %in% ando$gene_symbol)#3
 as25 %>% filter(symbol %in% ando$gene_symbol)#2
-
 
 
 # "HALLMARK_APOPTOSIS"   
@@ -615,9 +627,22 @@ unique(wp_sets$gs_name)
 # [265] "WP_HISTONE_MODIFICATIONS" 
 # [398] "WP_MONOAMINE_GPCRS"                                                                                
 # [399] "WP_MONOAMINE_TRANSPORT"  
-# [426] "WP_NEUROINFLAMMATION"  
+# [426] "WP_NEUROINFLAMMATION" 
+
+
+# # WP_TNFALPHA_SIGNALING_PATHWAY
+# 88] "WP_MITOCHONDRIAL_COMPLEX_I_ASSEMBLY_MODEL_OXPHOS_SYSTEM"                                           
+# [389] "WP_MITOCHONDRIAL_COMPLEX_II_ASSEMBLY"                                                              
+# [390] "WP_MITOCHONDRIAL_COMPLEX_III_ASSEMBLY"                                                             
+# [391] "WP_MITOCHONDRIAL_COMPLEX_IV_ASSEMBLY"                      
+
+# "WP_MITOCHONDRIAL_COMPLEX_" 
+# WP_GPCRS_CLASS_C_METABOTROPIC_GLUTAMATE_PHEROMONE"  
+
+
+
 wp_sets %>% 
-  filter(grepl( "WP_MAPK_CASCADE" ,gs_name,ignore.case = T))-> glu
+  filter(grepl("WP_TNFALPHA_SIGNALING_PATHWAY" ,gs_name,ignore.case = T))-> glu
 dd %>% filter(symbol %in% glu$gene_symbol)#8
 ds %>% filter(symbol %in% glu$gene_symbol)#18
 ad %>% filter(symbol %in% glu$gene_symbol)#7
@@ -694,7 +719,9 @@ ad25 %>% filter(symbol %in% ser$gene_symbol)#11
 as25 %>% filter(symbol %in% ser$gene_symbol)#5
 
 msigdbr(species = "Mus musculus", subcategory ='GO:BP' ) -> bp_sets
-unique(glu$gs_name)
+unique(x$gs_name)
+
+x <- bp_sets %>% filter(grepl("MITO", gs_name))
 #GLUTaMATE
 # "GOBP_SYNAPTIC_SIGNALING"
 # # [25] "GOBP_SYNAPTIC_TRANSMISSION_GLUTAMATERGIC" 
@@ -703,10 +730,15 @@ unique(glu$gs_name)
 # [5] "GOBP_REGULATION_OF_SHORT_TERM_NEURONAL_SYNAPTIC_PLASTICITY"        
 # [6] "GOBP_REGULATION_OF_SYNAPSE_STRUCTURAL_PLASTICITY"                  
 # [7] "GOBP_REGULATION_OF_SYNAPTIC_PLASTICITY"                            
-# # > 
+#
 
+
+
+# "GOBP_CELLULAR_RESPONSE_TO_STRESS"    
+# [58] "GOBP_MITOCHONDRION_ORGANIZATION"  
+                                                                            
 bp_sets %>% 
-  filter(grepl("GOBP_SYNAPTIC_SIGNALING" ,gs_name,ignore.case = T))-> glu
+  filter(grepl("GOBP_CELLULAR_RESPONSE_TO_STRESS" ,gs_name,ignore.case = T))-> glu
 dd %>% filter(symbol %in% glu$gene_symbol)#8
 ds %>% filter(symbol %in% glu$gene_symbol)#18
 ad %>% filter(symbol %in% glu$gene_symbol)#7
