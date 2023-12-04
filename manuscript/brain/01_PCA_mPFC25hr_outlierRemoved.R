@@ -78,7 +78,7 @@ d0 <- calcNormFactors(d0) #Normalizing step.
 
 
 ## Removing genes from PCA where average count is below cutoff.
-cutoff <- 40
+cutoff <- 35
 drop <- which(apply(cpm(d0), 1, max) < cutoff)
 dge.dl <- d0[-drop,]
 dim(dge.dl)
@@ -103,7 +103,7 @@ colData <- pfc_data1 %>% rownames_to_column(var = "SampleName") %>% cbind(colDat
 
 #get expression levels
 rv <- rowVars((v$E)) #measure of variation for each gene
-select <- order(rv, decreasing = TRUE)[1:275] #top 250 varying genes
+select <- order(rv, decreasing = TRUE)[1:350] #top 250 varying genes
 pca1 <- prcomp(t((v$E)[select, ])) #do pca
 
 #get groups
@@ -126,6 +126,7 @@ barplot(pv1, cex.names=1, xlab=paste("Principal component (PC), 1-", length(pca1
 var1 <- ((pca1$sdev[1]^2) / (sum(pca1$sdev^2)))*100
 var2 <- ((pca1$sdev[2]^2) / (sum(pca1$sdev^2)))*100
 var3 <- ((pca1$sdev[3]^2) / (sum(pca1$sdev^2)))*100
+
 var4 <- ((pca1$sdev[4]^2) / (sum(pca1$sdev^2)))*100
 
 ## actually plots 
@@ -139,9 +140,16 @@ ylab4=paste("PC4, ", round(pv1[4], 2), "%")
 p1=ggplot(d1, aes(PC1, PC2, color = condition1, shape = condition1))+
   geom_point(size = 5)+
   scale_shape_manual(values=c(16,17,15,3,7,8,1))+
-  labs(x = xlab, y = ylab)+
+  labs(x = xlab, y = ylab, color = "condition", shape = "condition")+
   scale_color_manual(values = viridis::viridis(6))+
-  theme_classic()
+  theme_dose()+ theme(text = element_text(size = 20))+
+  ggtitle('B. 25 hr PCA')
+
+p1
+
+ggsave("manuscript/brain/imgs/pca_mPFC_25hr_man.png", p1, width = 6, height = 5)
+
+
 
 p2=ggplot(d1, aes(PC1, PC3, color = condition1, shape = condition1))+
   geom_point(size = 5)+

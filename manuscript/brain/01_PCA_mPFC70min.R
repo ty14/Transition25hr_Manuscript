@@ -131,9 +131,14 @@ ylab4=paste("PC4, ", round(pv1[4], 2), "%")
 p1=ggplot(d1, aes(PC1, PC2, color = condition1, shape = condition1))+
   geom_point(size = 5)+
   scale_shape_manual(values=c(16,17,15,3,7,8,1))+
-  labs(x = xlab, y = ylab)+
+  labs(x = xlab, y = ylab, color = "condition", shape = "condition")+
   scale_color_manual(values = viridis::viridis(6))+
-  theme_classic()
+  theme_dose()+ theme(text = element_text(size = 20))+
+  ggtitle('A. 70 min PCA')
+
+p1
+
+ggsave("manuscript/brain/imgs/pca_mPFC_70mn_man.png", p1, width = 6, height = 5)
 
 p2=ggplot(d1, aes(PC1, PC3, color = condition1, shape = condition1))+
   geom_point(size = 5)+

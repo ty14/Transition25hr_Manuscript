@@ -13,6 +13,8 @@ library(clusterProfiler)
 library(enrichplot)
 library(organism, character.only = TRUE)
 library(DOSE)
+library(ComplexUpset)
+library(UpSetR)
 library(tidyverse)
 grcm38 # mouse genes
 
@@ -308,6 +310,5 @@ des_genes25 <- df_dsx %>% full_join(df_ddx)
 
 des_genes <- des_genes70 %>% rbind(des_genes25) %>% unique(.)
 write.csv(des_genes, "manuscript/brain/results_tables/des_genes_mPFC.csv")
-
 
 

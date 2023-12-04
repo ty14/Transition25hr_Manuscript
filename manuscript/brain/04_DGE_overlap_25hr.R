@@ -169,3 +169,29 @@ write.csv(dt_all,"manuscript/brain/results_tables/TRNgenesvsDOM_bothtimepoints.c
 
 st_all <- dd_st70 %>% rbind(dd_st25)
 write.csv(st_all,"manuscript/brain/results_tables/TRNgenesvsSUB_bothtimepoints.csv", row.names = F)
+
+
+
+
+source("manuscript/brain/04_DGE_overlap_70min.R")
+# dominant vs trn in both time points 
+listInput <- list(dt_up= dt_up$., dt_up25=dt_up25$., dt_down = dt_down$.,dt_down25 = dt_down25$.)
+
+
+UpSetR::upset(fromList(listInput), nsets = 4, order.by = "freq", keep.order = F)
+
+
+dt_up[dt_up$. %in% dt_up25$.,]
+dt_down[dt_down$. %in% dt_down25$.,]
+
+# subordinates vs trn in both time points 
+listInput <- list(st_up= st_up$., st_up25=st_up25$., st_down = st_down$.,st_down25 = st_down25$.)
+
+
+UpSetR::upset(fromList(listInput), nsets = 4, order.by = "freq", keep.order = F)
+
+st_up[st_up$. %in% st_up25$.,]
+st_down[st_down$. %in% st_down25$.,]
+
+
+st_down[st_down$. %in% st_up25$.,]
