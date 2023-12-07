@@ -45,12 +45,12 @@ dc$diffexpressed[dc$logFC > 0.2 & dc$P.Value < 0.05] <- "UP"
 # if log2Foldchange < -0.6 and pvalue < 0.05, set as "DOWN"
 dc$diffexpressed[dc$logFC < -0.2 & dc$P.Value < 0.05] <- "DOWN"
 
-
+dc$logFC <- ifelse(dc$logFC> 2.5, 2.5, dc$logFC)
 dcx <- dc %>% filter(.,logFC >= 1.1)%>% filter(P.Value < 0.05)
 dcxx <- dc %>% filter(.,logFC <= -0.75) %>% filter(P.Value < 0.05)
 dc$log10 <- ifelse(dc$log10 == Inf, 4,dc$log10)
 # dcx <- dc %>% filter(.,abs(logFC) >= 1.5) %>% filter(P.Value < 0.05) 
-dc$logFC <- ifelse(dc$logFC> 2.5, 2.5, dc$logFC)
+
 
 vp_ad <- ggplot(data = dc, 
                 aes(x = logFC, 
@@ -64,14 +64,14 @@ vp_ad <- ggplot(data = dc,
   geom_vline(xintercept=c(-.5,.5),lty=4,col="black",lwd=0.8) +
   geom_vline(xintercept=c(-1.5,1.5),lty=4,col="black",lwd=0.8) +
   geom_hline(yintercept = 1.301,lty=4,col="black",lwd=0.8) +
-  geom_text_repel(data = dcx, aes(x = logFC, y = -log10(P.Value),label = symbol), color = "black", vjust = 0.1,  hjust = -1.5)+
-  geom_text_repel(data = dcxx, aes(x = logFC, y = -log10(P.Value),label = symbol), color = "black", hjust = 0.5, vjust = -.5)+
+  geom_text_repel(data = dcx, aes(x = logFC, y = -log10(P.Value),label = symbol), color = "black", vjust = 0.1,  hjust = -1.2)+
+  geom_text_repel(data = dcxx, aes(x = logFC, y = -log10(P.Value),label = symbol), color = "black", hjust = 0., vjust = 0)+
   labs(x="log2 Fold Change",
        y=bquote(~-Log[10]~italic(eFDR)))  +
   theme_bw() +
-  annotate(geom="text", x=2, y=.5, label=paste0(" ", "\n", "in ASC"),
+  annotate(geom="text", x=2.15, y=.5, label=paste0(" ", "\n", "ASC vs. DOM"),
            color="black", size = 5)+
-  annotate(geom="text", x=-2, y=.5, label=paste0(" ", "\n", "in DOM"),
+  annotate(geom="text", x=-2.15, y=.5, label=paste0(" ", "\n", "ASC vs. DOM"),
            color="black",, size = 5)+
   scale_x_continuous(limits = c(-2.5,2.5),breaks = c(-2.5,-1.5,-0.5,0,0.5,1.5,2.5))+
   theme(axis.text.x = element_text(vjust = 1,size = 20),
@@ -140,14 +140,14 @@ vp_dd <- ggplot(data = dc,
   geom_vline(xintercept=c(-.5,.5),lty=4,col="black",lwd=0.8) +
   geom_vline(xintercept=c(-1.5,1.5),lty=4,col="black",lwd=0.8) +
   geom_hline(yintercept = 1.301,lty=4,col="black",lwd=0.8) +
-  geom_text_repel(data = dcx, aes(x = logFC, y = -log10(P.Value),label = symbol), color = "black", vjust = 0.5,  hjust = -.8)+
+  geom_text_repel(data = dcx, aes(x = logFC, y = -log10(P.Value),label = symbol), color = "black", vjust = 1,  hjust = -1)+
   geom_text_repel(data = dcxx, aes(x = logFC, y = -log10(P.Value),label = symbol), color = "black", hjust = 1.11, vjust = -.5)+
   labs(x="log2 Fold Change",
        y=bquote(~-Log[10]~italic(eFDR)))  +
   theme_bw() +
-  annotate(geom="text", x=2, y=.5, label=paste0(" ", "\n", "in DES"),
+  annotate(geom="text", x=2.15, y=.5, label=paste0(" ", "\n", "DES vs. DOM"),
            color="black", size = 5)+
-  annotate(geom="text", x=-2, y=.5, label=paste0(" ", "\n", "in DOM"),
+  annotate(geom="text", x=-2.15, y=.5, label=paste0(" ", "\n", "DES vs. DOM"),
            color="black",, size = 5)+
   scale_x_continuous(limits = c(-2.5,2.5),breaks = c(-2.5,-1.5,-0.5,0,0.5,1.5,2.5))+
   theme(axis.text.x = element_text(vjust = 1,size = 20),
@@ -218,14 +218,14 @@ vp_as <- ggplot(data = dc,
   geom_vline(xintercept=c(-.5,.5),lty=4,col="black",lwd=0.8) +
   geom_vline(xintercept=c(-1.5,1.5),lty=4,col="black",lwd=0.8) +
   geom_hline(yintercept = 1.301,lty=4,col="black",lwd=0.8) +
-  geom_text_repel(data = dcx, aes(x = logFC, y = -log10(P.Value),label = symbol), color = "black", vjust = 0.65,  hjust = -.5)+
-  geom_text_repel(data = dcxx, aes(x = logFC, y = -log10(P.Value),label = symbol), color = "black", hjust = 0.5, vjust = -0.5)+
+  geom_text_repel(data = dcx, aes(x = logFC, y = -log10(P.Value),label = symbol), color = "black", vjust = 0.8,  hjust = -0.2)+
+  geom_text_repel(data = dcxx, aes(x = logFC, y = -log10(P.Value),label = symbol), color = "black", hjust = 0, vjust = 0.1)+
   labs(x="log2 Fold Change",
        y=bquote(~-Log[10]~italic(eFDR)))  +
   theme_bw() +
-  annotate(geom="text", x=2, y=.5, label=paste0(" ", "\n", "in ASC"),
+  annotate(geom="text", x=2.15, y=.5, label=paste0(" ", "\n", "ASC vs. SUB"),
            color="black", size = 5)+
-  annotate(geom="text", x=-2, y=.5, label=paste0(" ", "\n", "in SUB"),
+  annotate(geom="text", x=-2.15, y=.5, label=paste0(" ", "\n", "ASC vs. SUB"),
            color="black",, size = 5)+
   scale_x_continuous(limits = c(-2.5,2.5),breaks = c(-2.5,-1.5,-0.5,0,0.5,1.5,2.5))+
   theme(axis.text.x = element_text(vjust = 1,size = 20),
@@ -277,11 +277,11 @@ dc$diffexpressed[dc$logFC > 0.2 & dc$P.Value < 0.05] <- "UP"
 # if log2Foldchange < -0.6 and pvalue < 0.05, set as "DOWN"
 dc$diffexpressed[dc$logFC < -0.2 & dc$P.Value < 0.05] <- "DOWN"
 
-
+dc$logFC <- ifelse(dc$logFC >2.5, 2.495, dc$logFC)
 dcx <- dc %>% filter(.,logFC >= 1.6) %>% filter(P.Value < 0.05)
 dcxx <- dc %>% filter(.,logFC <= -1.4) %>% filter(P.Value < 0.05)
 dc$log10 <- ifelse(dc$log10 == Inf, 4,dc$log10)
-dc$logFC <- ifelse(dc$logFC >2.5, 2.495, dc$logFC)
+
 # dcx <- dc %>% filter(.,abs(logFC) >= 1.5) %>% filter(P.Value < 0.05) 
 
 vp_ds <-ggplot(data = dc, 
@@ -296,14 +296,14 @@ vp_ds <-ggplot(data = dc,
   geom_vline(xintercept=c(-.5,.5),lty=4,col="black",lwd=0.8) +
   geom_vline(xintercept=c(-1.5,1.5),lty=4,col="black",lwd=0.8) +
   geom_hline(yintercept = 1.301,lty=4,col="black",lwd=0.8) +
-  geom_text_repel(data = dcx, aes(x = logFC, y = -log10(P.Value),label = symbol), color = "black", vjust = 0.5,  hjust = -1)+
-  geom_text_repel(data = dcxx, aes(x = logFC, y = -log10(P.Value),label = symbol), color = "black", hjust = 1.75, vjust = -0.75)+
+  geom_text_repel(data = dcx, aes(x = logFC, y = -log10(P.Value),label = symbol), color = "black", vjust = 0.2,  hjust = -1)+
+  geom_text_repel(data = dcxx, aes(x = logFC, y = -log10(P.Value),label = symbol), color = "black", hjust = 0.25, vjust = -1)+
   labs(x="log2 Fold Change",
        y=bquote(~-Log[10]~italic(eFDR)))  +
   theme_bw() +
-  annotate(geom="text", x=2, y=.5, label=paste0(" ", "\n", "in DES"),
+  annotate(geom="text", x=2.15, y=.5, label=paste0(" ", "\n", "DES vs. SUB"),
            color="black", size = 5)+
-  annotate(geom="text", x=-2, y=.5, label=paste0(" ", "\n", "in SUB"),
+  annotate(geom="text", x=-2.15, y=.5, label=paste0(" ", "\n", "DES vs. SUB"),
            color="black",, size = 5)+
   scale_x_continuous(limits = c(-2.5,2.5),breaks = c(-2.5,-1.5,-0.5,0,0.5,1.5,2.5))+
   theme(axis.text.x = element_text(vjust = 1,size = 20),
