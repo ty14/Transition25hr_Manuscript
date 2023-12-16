@@ -66,7 +66,7 @@ p1 <- ggplot(p70_up, aes(group,value, color = group, fill = group))+
   theme(legend.position = "none", text =element_text(size = 15))
 p1
 print(p1)
-ggsave("manuscript/brain/imgs/TRN70_UPreg_genes_boxplots.png",p1, width =9 , height = 4.5, dpi = 300)
+ggsave("manuscript/brain/imgs/TRN70_UPreg_genes_boxplots.png",p1, width =8.75, height = 4.25, dpi = 300)
 
 
 #down
@@ -83,7 +83,7 @@ p1 <- ggplot(p70_down, aes(group,value, color = group, fill = group))+
   theme(legend.position = "none", text =element_text(size = 15))
 p1
 
-ggsave("manuscript/brain/imgs/TRN70_DOWNreg_genes_boxplots.png", width =10 , height = 4.25, dpi = 300)
+ggsave("manuscript/brain/imgs/TRN70_DOWNreg_genes_boxplots.png", width =11 , height = 4.25, dpi = 300)
 
 
 #25hr
@@ -147,7 +147,7 @@ p1 <- ggplot(p25_up, aes(group,value, color = group, fill = group))+
   theme(legend.position = "none", text =element_text(size = 15))
 p1
 
-ggsave("manuscript/brain/imgs/TRN25_UPreg_genes_boxplots.png", width =10 , height = 2.5, dpi = 300)
+ggsave("manuscript/brain/imgs/TRN25_UPreg_genes_boxplots.png", width =10.75, height = 2.4, dpi = 300)
 
 
 p1 <- ggplot(p25_down, aes(group,value, color = group, fill = group))+
@@ -163,4 +163,4 @@ p1 <- ggplot(p25_down, aes(group,value, color = group, fill = group))+
   theme(legend.position = "none", text =element_text(size = 15))
 p1
 
-ggsave("manuscript/brain/imgs/TRN25_DOWNreg_genes_boxplots.png", width =10 , height = 2.5, dpi = 300)
+ggsave("manuscript/brain/imgs/TRN25_DOWNreg_genes_boxplots.png", width =10.75 , height = 2.4, dpi = 300)
