@@ -25,8 +25,8 @@ msigdbr_collections() %>% as.data.frame()
 #reactome = immune, metabolic 
 
 
-msigdbr(species = "Mus musculus", subcategory ="CP:REACTOME") -> reactome_sets
-unique(reactome_sets$gs_name)
+# msigdbr(species = "Mus musculus", subcategory ="CP:REACTOME") -> reactome_sets
+# unique(reactome_sets$gs_name)
 
 
 grcm38 # mouse genes
@@ -44,12 +44,12 @@ y1a <- limma_list$ascsub
 
 
 #1 ATP metablic Energy 
-msigdbr(species = "Mus musculus", subcategory ="GO:BP") -> bp_sets
-# [2] "GOBP_ATP_METABOLIC_PROCESS"
-bp_sets %>%
-  filter(grepl("GOBP_ATP_METABOLIC_PROCESS",gs_name,ignore.case = T)) %>%
-  select(gene_symbol) %>%  as_tibble() %>%
-  .$gene_symbol -> enx
+# msigdbr(species = "Mus musculus", subcategory ="GO:BP") -> bp_sets
+# # [2] "GOBP_ATP_METABOLIC_PROCESS"
+# bp_sets %>%
+#   filter(grepl("GOBP_ATP_METABOLIC_PROCESS",gs_name,ignore.case = T)) %>%
+#   select(gene_symbol) %>%  as_tibble() %>%
+#   .$gene_symbol -> enx
 
 # #2 Cytokine Signaling
 # msigdbr(species = "Mus musculus", subcategory ="CP:REACTOME") -> reactome_sets
@@ -57,6 +57,12 @@ bp_sets %>%
 # filter(grepl("REACTOME_CYTOKINE_SIGNALING_IN_IMMUNE_SYSTEM",gs_name,ignore.case = T))  %>%
 # select(gene_symbol) %>%  as_tibble() %>%
 #  .$gene_symbol -> enx
+
+
+#3. Myelination Regulation 
+my <- read_csv("manuscript/brain/gene_sets/myelin.csv")
+my %>%  select(gene_symbol) %>%  as_tibble() %>%
+  .$gene_symbol -> enx
 
 ###############################
 head(y4a)
@@ -332,9 +338,9 @@ EnhancedVolcano(df,
                 labCol = "black",
                 labSize = 2.1)+
   annotate("text", x = 0.8, y = 4.4,color = "purple4" , size = 2,
-           label =glue::glue("Relatively Upregulated in ASC", "\n", "{my_texts[3,4]}"))+
+           label =glue::glue("Relatively Upregulated in ASC", "\n", "{my_texts[2,4]}"))+
   annotate("text", x = -0.8, y = 4.4,color = "orange" , size = 2,
-           label = glue::glue("Relatively Upregulated in SUB","\n", "{my_texts[2,4]}"))+
+           label = glue::glue("Relatively Upregulated in SUB","\n", "{my_texts[3,4]}"))+
   scale_x_continuous(limits = c(-1.5,1.5),breaks = c(-1.5,-1,-0.5,0,0.5,1,1.5))+
   scale_y_continuous(limits = c(-0.1,4.8),breaks = c(0,1,2,3,4),expand=expansion(mult=c(0.0005,0.0)))+
   theme_bw(base_size = 7)+
@@ -359,3 +365,8 @@ invisible(dev.off())
 # top<- grid::textGrob("Cytokine Signaling at 25 hr", gp = grid::gpar(fontsize = 10))
 # endo_plot <- gridExtra::grid.arrange(a,b,c,d, ncol =2, top = top)
 # ggsave("manuscript/brain/imgs/CytokineSignaling_25hr_use.png",endo_plot,height =5.5, width =5.5, dpi=1000)
+
+ #3. Myelin Regulation 
+top<- grid::textGrob("Myelin Regulation at 25 hr", gp = grid::gpar(fontsize = 10))
+endo_plot <- gridExtra::grid.arrange(a,b,c,d, ncol =2, top = top)
+ggsave("manuscript/brain/imgs/MyelinRegulation_25hr_use.png",endo_plot,height =5.5, width =5.5, dpi=1000)

@@ -51,11 +51,17 @@ y1a <- limma_list$ascsub
 #   select(gene_symbol) %>%  as_tibble() %>%
             # .$gene_symbol -> enx
 
-# 2 Cytokine Signaling
-msigdbr(species = "Mus musculus", subcategory ="CP:REACTOME") -> reactome_sets
-reactome_sets %>%
-filter(grepl("REACTOME_CYTOKINE_SIGNALING_IN_IMMUNE_SYSTEM",gs_name,ignore.case = T))  %>%
-select(gene_symbol) %>%  as_tibble() %>%
+# # 2 Cytokine Signaling
+# msigdbr(species = "Mus musculus", subcategory ="CP:REACTOME") -> reactome_sets
+# reactome_sets %>%
+# filter(grepl("REACTOME_CYTOKINE_SIGNALING_IN_IMMUNE_SYSTEM",gs_name,ignore.case = T))  %>%
+# select(gene_symbol) %>%  as_tibble() %>%
+#  .$gene_symbol -> enx
+
+
+#3. Myelination Regulation 
+my <- read_csv("manuscript/brain/gene_sets/myelin.csv")
+my %>%  select(gene_symbol) %>%  as_tibble() %>%
  .$gene_symbol -> enx
 
 ###############################
@@ -231,7 +237,7 @@ df %>%
   filter(abs(logFC) > my_logFC_threshold) %>%
   arrange(logFC) %>%
   mutate(effects = abs(sin(logFC)*-log10(P.Value))) %>%
-  top_n(10) %>%
+  top_n(-10) %>%
   # top_frac(.,1) %>%
   # filter(P.Value <0.01 | abs(logFC) >0.5) %>%
   .$symbol -> for_label
@@ -303,7 +309,7 @@ df %>%
   filter(abs(logFC) > my_logFC_threshold) %>%
   arrange(logFC) %>%
   mutate(effects = abs(sin(logFC)*-log10(P.Value))) %>%
-  top_n(10) %>%
+  top_n(-10) %>%
   # top_frac(.,1) %>%
   # filter(P.Value <0.01 | abs(logFC) >0.5) %>%
   .$symbol -> for_label
@@ -356,6 +362,13 @@ invisible(dev.off())
 
 # #2. inflammation
 # #cytokines
-top<- grid::textGrob("Cytokine Signaling at 70 min", gp = grid::gpar(fontsize = 10))
+# top<- grid::textGrob("Cytokine Signaling at 70 min", gp = grid::gpar(fontsize = 10))
+# endo_plot <- gridExtra::grid.arrange(a,b,c,d, ncol =2, top = top)
+# ggsave("manuscript/brain/imgs/CytokineSignaling_70min_use.png",endo_plot,height =5.5, width =5.5, dpi=1000)
+
+
+#3. Myelin Regulation 
+top<- grid::textGrob("Myelin Regulation at 70 min", gp = grid::gpar(fontsize = 10))
 endo_plot <- gridExtra::grid.arrange(a,b,c,d, ncol =2, top = top)
-ggsave("manuscript/brain/imgs/CytokineSignaling_70min_use.png",endo_plot,height =5.5, width =5.5, dpi=1000)
+ggsave("manuscript/brain/imgs/MyelinRegulation_70min_use.png",endo_plot,height =5.5, width =5.5, dpi=1000)
+

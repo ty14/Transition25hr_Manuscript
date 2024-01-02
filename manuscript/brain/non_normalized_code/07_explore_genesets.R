@@ -183,13 +183,13 @@ unique(reactome_sets$gs_name)
 
 #IMMUNE 
 reactome_sets %>% 
-  filter(grepl("immune",gs_name,ignore.case = T)) -> my_gs_sets
+  filter(grepl("myelin",gs_name,ignore.case = T)) -> my_gs_sets
 
 unique(my_gs_sets$gs_name)
 
 #adaptive immune = 1263 genes 
 reactome_sets %>% 
-  filter(grepl("REACTOME_ADAPTIVE_IMMUNE_SYSTEM",gs_name,ignore.case = T)) %>% select(gene_symbol) -> a_immune
+  filter(grepl("REACTOME_EGR2_AND_SOX10_MEDIATED_INITIATION_OF_SCHWANN_CELL_MYELINATION",gs_name,ignore.case = T)) %>% select(gene_symbol) -> a_immune
 
 dd %>% filter(symbol %in% a_immune$gene_symbol)#27
 ds %>% filter(symbol %in% a_immune$gene_symbol)#57
@@ -616,7 +616,9 @@ as25 %>% filter(symbol %in% emt$gene_symbol)#5
 msigdbr_collections() %>% as.data.frame()
 msigdbr(species = "Mus musculus", subcategory ='CP:WIKIPATHWAYS' ) -> wp_sets
 unique(wp_sets$gs_name)
-
+wp_sets %>% 
+  filter(grepl("myelin" ,gs_name,ignore.case = T)) -> emt
+unique(emt$gs_name)
 # "WP_ANDROGEN_RECEPTOR_SIGNALING_PATHWAY"
 # "WP_APOPTOSIS_MODULATION_AND_SIGNALING" 
 # "WP_CORTICOTROPINRELEASING_HORMONE_SIGNALING_PATHWAY" 
@@ -642,7 +644,7 @@ unique(wp_sets$gs_name)
 
 
 wp_sets %>% 
-  filter(grepl("WP_TNFALPHA_SIGNALING_PATHWAY" ,gs_name,ignore.case = T))-> glu
+  filter(grepl("WP_OLIGODENDROCYTE_SPECIFICATION_AND_DIFFERENTIATION_LEADING_TO_MYELIN_COMPONENTS_FOR_CNS" ,gs_name,ignore.case = T))-> glu
 dd %>% filter(symbol %in% glu$gene_symbol)#8
 ds %>% filter(symbol %in% glu$gene_symbol)#18
 ad %>% filter(symbol %in% glu$gene_symbol)#7
@@ -721,7 +723,7 @@ as25 %>% filter(symbol %in% ser$gene_symbol)#5
 msigdbr(species = "Mus musculus", subcategory ='GO:BP' ) -> bp_sets
 unique(x$gs_name)
 
-x <- bp_sets %>% filter(grepl("MITO", gs_name))
+x <- bp_sets %>% filter(grepl("myelin", gs_name,ignore.case = T))
 #GLUTaMATE
 # "GOBP_SYNAPTIC_SIGNALING"
 # # [25] "GOBP_SYNAPTIC_TRANSMISSION_GLUTAMATERGIC" 
@@ -738,7 +740,7 @@ x <- bp_sets %>% filter(grepl("MITO", gs_name))
 # [58] "GOBP_MITOCHONDRION_ORGANIZATION"  
                                                                             
 bp_sets %>% 
-  filter(grepl("GOBP_CELLULAR_RESPONSE_TO_STRESS" ,gs_name,ignore.case = T))-> glu
+  filter(grepl("GOBP_REGULATION_OF_MYELINATION" ,gs_name,ignore.case = T))-> glu
 dd %>% filter(symbol %in% glu$gene_symbol)#8
 ds %>% filter(symbol %in% glu$gene_symbol)#18
 ad %>% filter(symbol %in% glu$gene_symbol)#7
