@@ -69,7 +69,7 @@ listInput <- list(adom_up= adom_up$symbol, dd_up=dd_up$symbol, adom_down = adom_
 UpSetR::upset(fromList(listInput), nsets = 4, order.by = "freq", keep.order = F)
 
 #getting overlap genes with for dom and trn groups 
-dt_up25 <- adom_up$symbol[adom_up$symbol %in% dd_up$symbol] %>% as.data.frame()
+dt_up25 <- adom_up$symbol[adom_up$symbol %in% dd_up$symbol] %>% as.data.frame() %>% unique(.)
 dt_down25 <- adom_down$symbol[adom_down$symbol %in% dd_down$symbol]%>% as.data.frame()
 
 
@@ -78,6 +78,8 @@ mat <- matrix(c(29,0,0,32),ncol=2)
 # Perform chi-squared test
 chi_square <- chisq.test(mat)
 
+# data:  mat
+# X-squared = 57.056, df = 1, p-value = 4.235e-14
 
 # subs
 listInput <- list(dsub_up= dsub_up$symbol, as_up=as_up$symbol, dsub_down = dsub_down$symbol, 
@@ -96,7 +98,8 @@ mat <- matrix(c(105,0,0,73),ncol=2)
 # Perform chi-squared test
 chi_square <- chisq.test(mat)
 chi_square
-
+# data:  mat
+# X-squared = 173.89, df = 1, p-value < 2.2e-16
 
 # looking for overlap in transition groups between sub and dom comparision 
 listInput <- list(st_up25= st_up25$., dt_up25=dt_up25$., st_down25 = st_down25$.,dt_down25 = dt_down25$.)
@@ -113,7 +116,8 @@ mat <- matrix(c(5,0,0,5),ncol=2)
 # Perform chi-squared test
 chi_square <- chisq.test(mat)
 chi_square
-
+# data:  mat
+# X-squared = 6.4, df = 1, p-value = 0.01141
 
 colnames(dt_up25)[1]<- "symbol"
 dt_up <- dt_up25 %>% mutate(regulated = "up") %>% mutate(condition = "TRN vs DOM") %>% mutate(time = 25)
@@ -125,6 +129,7 @@ dt <- dt_up %>%  rbind(dt_down)
 
 df_dd <- dd %>% select(symbol, dd_logFC= logFC, dd_pv= P.Value) %>%
   mutate(time = 25) %>%  filter(symbol %in% dt$symbol) %>% filter(symbol != "")
+
 df_adom <- adom %>% select(symbol, adom_logFC= logFC, adom_pv= P.Value) %>%
   mutate(time = 25) %>% filter(symbol %in% dt$symbol)%>% filter(symbol != "")
 
@@ -153,7 +158,7 @@ dd_st25 <- dd_st %>% full_join(st)
 
 
 
-# source("manuscript/brain/04DEG-overlap_70min.R")
+source("manuscript/brain/05_DGE_overlap_70min.R")
 dt_all <- dd_dt70 %>% rbind(dd_dt25)
 write.csv(dt_all,"manuscript/brain/results_tables/TRNgenesvsDOM_bothtimepoints.csv", row.names = F)
 
@@ -163,8 +168,11 @@ write.csv(st_all,"manuscript/brain/results_tables/TRNgenesvsSUB_bothtimepoints.c
 
 dd_up <- dd_dt70 %>% filter(regulated == "up")
 dd_down <- dd_dt70 %>% filter(regulated == "down")
+
 dd25_up <-dd_dt25 %>%filter(regulated == "up")
 dd25_down<- dd_dt25 %>% filter(regulated == "down")
+
+
 # dominant vs trn in both time points 
 listInput <- list(dt_up= dd_up$symbol, dt_up25=dd25_up$symbol, dt_down = dd_down$symbol,dt_down25 = dd25_down$symbol)
 

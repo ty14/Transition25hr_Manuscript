@@ -102,8 +102,8 @@ adtx_down <- adom_down$symbol[adom_down$symbol %in% adom_upx$symbol]%>% as.data.
 #significant test
 mat <- matrix(c(9,8,4,4),ncol=2)
 # Perform chi-squared test
-chi_square <- chisq.test(mat)
-chi_square
+# chi_square <- chisq.test(mat)
+# chi_square
 
 # DES vs DOM 
 listInput <- list(dd_up= dd_up$symbol, dd_up25=dd_upx$symbol, dd_down = dd_down$symbol, 
@@ -123,8 +123,8 @@ ddtx_down <- dd_down$symbol[dd_down$symbol %in% dd_upx$symbol]%>% as.data.frame(
 #significant test
 mat <- matrix(c(11,7,5,3),ncol=2)
 # Perform chi-squared test
-chi_square <- chisq.test(mat)
-chi_square
+# chi_square <- chisq.test(mat)
+# chi_square
 
 # ASC vs SUB 
 listInput <- list(as_up= as_up$symbol, as_up25=as_upx$symbol, as_down = as_down$symbol, 
@@ -135,8 +135,8 @@ UpSetR::upset(fromList(listInput), nsets = 4, order.by = "freq", keep.order = F)
 #significant test
 mat <- matrix(c(16,12,10,8),ncol=2)
 # Perform chi-squared test
-chi_square <- chisq.test(mat)
-chi_square
+# chi_square <- chisq.test(mat)
+# chi_square
 
 
 #getting overlap genes 
@@ -205,15 +205,21 @@ d_down$.[d_down$. %in% d_downx$.]
 
 #now ascenders in dom and sub at 70 min and 25 hr 
 # 
-listInput <- list(as_up= as_up$symbol, as_up25=as_upx$symbol, as_down = as_down$symbol, 
-                  as_down25 = as_downx$symbol,adom_up= adom_up$symbol, adom_up25=dd_upx$symbol, 
-                  adom_down = adom_down$symbol, adom_down25 = adom_downx$symbol)
+listInput <- list(as_up= as_up$symbol,
+                  as_up25=as_upx$symbol,
+                  as_down = as_down$symbol, 
+                  as_down25 = as_downx$symbol,
+                  adom_up= adom_up$symbol, 
+                  adom_up25=adom_upx$symbol, 
+                  adom_down = adom_down$symbol, 
+                  adom_down25 = adom_downx$symbol)
 
 UpSetR::upset(fromList(listInput), nsets = 8, order.by = "freq", keep.order = F)
 
 
 #just 70min
-listInput <- list(as_up= as_up$symbol,as_down = as_down$symbol, 
+listInput <- list(as_up= as_up$symbol,
+                  as_down = as_down$symbol, 
                   adom_up= adom_up$symbol, 
                   adom_down = adom_down$symbol)
 
@@ -221,22 +227,23 @@ UpSetR::upset(fromList(listInput), nsets = 4, order.by = "freq", keep.order = F)
 
 
 #25 hr
-listInput <- list( as_up25=as_upx$symbol,
-                  as_down25 = as_downx$symbol, adom_up25=dd_upx$symbol, 
-                   adom_down25 = adom_downx$symbol)
+listInput <- list(as_up25=as_upx$symbol,
+                  as_down25 = as_downx$symbol, 
+                  adom_up25=adom_upx$symbol, 
+                  adom_down25 = adom_downx$symbol)
 
  UpSetR::upset(fromList(listInput), nsets = 4, order.by = "freq", keep.order = F)
 
  #one gene down in sub and up in dom 70min 
- 
  adom_up$symbol[adom_up$symbol %in% as_down$symbol]%>% as.data.frame()
- #one gene up in sub and down in dom 25hr
- as_upx$symbol[as_upx$symbol %in% adom_downx$symbol]%>% as.data.frame()
+
+#one gene up in sub and down in dom 25hr
+ adom_downx$symbol[adom_downx$symbol %in% as_downx$symbol]%>% as.data.frame()
  
  a_up<- as_up$symbol[as_up$symbol %in% adom_up$symbol] %>% as.data.frame()
  a_down <-as_down$symbol[as_down$symbol %in% adom_down$symbol]%>% as.data.frame()
  
- a_upx<- as_upx$symbol[dsub_upx$symbol %in% adom_upx$symbol] %>% as.data.frame()
+ a_upx<- as_upx$symbol[as_upx$symbol %in% adom_upx$symbol] %>% as.data.frame()
  a_downx <- as_downx$symbol[as_downx$symbol %in% adom_downx$symbol]%>% as.data.frame()
  
  a_up$.[a_up$. %in% a_upx$.]
@@ -244,7 +251,7 @@ listInput <- list( as_up25=as_upx$symbol,
  
 
  
- colnames(a_up)[1]<- "symbol"
+colnames(a_up)[1]<- "symbol"
 a_up <- a_up %>% mutate(regulated = "up") %>% mutate(condition = "ascenders") %>% mutate(time = 70)
  
 colnames(a_down)[1]<- "symbol"

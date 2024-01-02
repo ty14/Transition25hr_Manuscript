@@ -1,168 +1,88 @@
 # libraries 
 library(limma)
 library(edgeR)
+library(WGCNA)
 library(Mus.musculus)
 organism = 'org.Mm.eg.db'
 library(organism, character.only = TRUE)
 library(biomaRt)
 library(AnnotationDbi)
+library(pheatmap)
 library(annotables)
-grcm38 # mouse genes
+library(clusterProfiler)
+library(enrichplot)
+library(organism, character.only = TRUE)
+library(DOSE)
 library(tidyverse)
+grcm38 # mouse genes
 
 
-#Getting metadata ready 
-coldata <- read_csv("brain/sample25hr_table.csv")
-head(coldata)
-str(coldata)
-
-#group thing 
-coldata$groupEX <- coldata$group
-# Normalizing cort data
-# df <- transform(df, N = (N - min(N)) / (max(N) - min(N))
-
-coldata <-coldata %>% mutate(post_Ncort =  (mean_con_ng_ul - min(mean_con_ng_ul,na.rm=T))/(max(mean_con_ng_ul,na.rm=T)-min(mean_con_ng_ul,na.rm=T)))
-coldata <- coldata %>%  dplyr::select(-group, -period)
-# coldata$post_Ncort[is.na(coldata$post_Ncort)] = mean(post_Ncort)
-
-#getting condition1
-table(coldata$condition)
-# CDOM, RDOM to Descenders (DOM to SUB)(4->1)
-# CSUB, SUB to Ascenders (Sub to DOM)  (1->4)
-
-coldata$condition1 <- ifelse(coldata$condition == "same" & coldata$Prerank == 1, "DOM", coldata$condition)
-coldata$condition1 <- ifelse(coldata$condition1 == "same" & coldata$Prerank == 4, "SUB", coldata$condition1)
-coldata$condition1 <- ifelse(coldata$condition == "descenders" & coldata$Postrank == 4 & coldata$Prerank == 1, "DES", coldata$condition1)
-coldata$condition1 <- ifelse(coldata$condition == "ascenders" & coldata$Prerank == 4 & coldata$Postrank == 1, "ASC", coldata$condition1)
-
-coldata$condition1  <- coldata$condition1  %>% replace_na('SUB')
-coldata$condition1  <- paste(coldata$condition1, coldata$time)
-
-coldata <- coldata %>% 
-  filter(region == "P")
-
-coldata$Sampleid <- substr(coldata$SampleNames,6,12)
-
-coldata25 <- coldata %>% select(condition1, Sampleid) 
-
-#remove outlier
-#b1.2.1 outlier DES
-pfc_data25 <- coldata25 %>% filter(Sampleid != 'b1.2.1.')
-
-#now 70 min data 
-coldata <- read_csv("brain/sample70min_table.csv")
-head(coldata)
-str(coldata)
-
-#group thing 
-coldata$groupEX <- coldata$group
-# Normalizing cort data
-# df <- transform(df, N = (N - min(N)) / (max(N) - min(N))
-
-coldata <-coldata %>% mutate(post_Ncort =  (mean_con_ng_ul - min(mean_con_ng_ul,na.rm=T))/(max(mean_con_ng_ul,na.rm=T)-min(mean_con_ng_ul,na.rm=T)))
-coldata <- coldata %>%  dplyr::select(-group, -period)
-# coldata$post_Ncort[is.na(coldata$post_Ncort)] = mean(post_Ncort)
-
-#getting condition1
-table(coldata$condition)
-# CDOM, RDOM to Descenders (DOM to SUB)(4->1)
-# CSUB, SUB to Ascenders (Sub to DOM)  (1->4)
-
-coldata$condition1 <- ifelse(coldata$condition == "same" & coldata$Prerank == 1, "DOM", coldata$condition)
-coldata$condition1 <- ifelse(coldata$condition1 == "same" & coldata$Prerank == 4, "SUB", coldata$condition1)
-coldata$condition1 <- ifelse(coldata$condition == "descenders" & coldata$Postrank == 4 & coldata$Prerank == 1, "DES", coldata$condition1)
-coldata$condition1 <- ifelse(coldata$condition == "ascenders" & coldata$Prerank == 4 & coldata$Postrank == 1, "ASC", coldata$condition1)
-
-coldata$condition1  <- coldata$condition1  %>% replace_na('SUB')
-coldata$condition1 <- paste(coldata$condition1, coldata$time)
-pfc_data1<- coldata %>% 
-  filter(region != "AMY") %>% 
-  filter(Postrank != 3) %>% 
-  filter(condition1 != "control 1 hr") %>% 
-  filter(condition1 != "ascenders 1 hr")
-
-table(pfc_data1$condition1)
-pfc_data1$Sampleid <- substr(pfc_data1$SampleName, 7,13)
-pfc_data70 <- pfc_data1 %>% select(condition1, Sampleid)
-
-
-pfc_data <- pfc_data70 %>% rbind(pfc_data25) 
-pfc_data <- pfc_data %>% column_to_rownames(., var = "Sampleid")
-
-### 70 min data 
 # Expression values
-dlNorm70 <-  read.csv("brain/PFC_counts.csv", row.names = 1)
+dlNorm <-  read.csv("brain/PFC_25hcounts.csv", row.names = 1)
 #remove zeros
-dlNorm70 <- dlNorm70[apply(dlNorm70[], 1, function(x) !all(x==0)),]
+dlNorm <- dlNorm[apply(dlNorm[], 1, function(x) !all(x==0)),]
 #trim sample ids
-colnames(dlNorm70)[c(1:67)] <- substr(colnames(dlNorm70)[c(1:67)], 7, 13)
+colnames(dlNorm)[c(1:24)] <- substr(colnames(dlNorm)[c(1:24)], 6, 11)
+
+#b1.2.1 outlier DES - remove
+dlNorm <- dlNorm[,c(1:19,21:24)]
 
 
-# Bring in count data for mPFC 25 hr 
-dlNorm25 <-  read.csv("brain/PFC_25hcounts.csv", row.names = 1)
-#remove zeros
-dlNorm25 <- dlNorm25[apply(dlNorm25[], 1, function(x) !all(x==0)),]
-#trim sample ids
-colnames(dlNorm25)[c(1:24)] <- substr(colnames(dlNorm25)[c(1:24)], 6, 12)
-#remove outlier B1.1.2.
-dlNorm25 <- dlNorm25[,c(1:19,21:24)]
+#Group traits
+#Getting metadata ready 
+coldata <- read.csv("manuscript/brain/non_normalized_code/results_tables/coldata25hr_use.csv")
+head(coldata)
+
+coldata$SampleNames <-  substr(coldata$SampleNames, 6,11)
 
 
-#combinf counts to normalize together 
-dl70 <- dlNorm70 %>% rownames_to_column(., var = "gene")
-dl25 <- dlNorm25 %>% rownames_to_column(., var = "gene")
+coldata <- coldata %>% column_to_rownames(., var = "SampleNames")
 
-dlNorm <- dl70 %>% full_join(dl25)
-dlNorm <- dlNorm %>% column_to_rownames(., var= "gene")
-
-
-colnames(dlNorm)
-rownames(pfc_data)
-
+coldata
 #check before normalizing 
-dlNorm<- dlNorm[ ,rownames(pfc_data)]
-all(rownames(pfc_data) == colnames(dlNorm))
+dlNorm<- dlNorm[,rownames(coldata)]
+all(rownames(coldata) == colnames(dlNorm))
 
 #normalize and filter with all groups 
-# row.names(dlNorm) <- nrows
+
 dlNorm <- dlNorm[!is.na(rowSums(dlNorm)),]
 
 d = apply(dlNorm, 2, as.numeric)
 dim(d)
 
-d0= DGEList(d, group = pfc_data$condition1)
+d0= DGEList(d, group = coldata$condition1)
 dim(d0)
 rownames(d0) <- rownames(dlNorm)
 d0 <- calcNormFactors(d0)
 
+#won used 10 in 90% of samples for brain paper, which is what tutorial suggest. 
+#in liver paper she did 50 in 90% samples 
 cutoff <- 10
 drop <- which(apply(cpm(d0), 1, max) < cutoff)
 dge.dl <- d0[-drop,]
 dim(dge.dl)
-# [1] 13367    51
+# [1] 13066    23
+
+
 # Now take out groups that you want
-#70min first 
 dge.dl$samples$group
 
-dge.dl_dom <- dge.dl[, dge.dl$samples$group %in% c("ASC 25hr", "DES 25hr", "DOM 25hr", "SUB 25hr")]
-dge.dl_dom$samples$group <- droplevels(dge.dl_dom$samples$group)
-dge.dl_dom$samples$group
-dge.dl<- dge.dl_dom
-dge.dl$samples$group
 
-pfc_data %>% 
-  filter( condition1 %in% c("ASC 25hr", "DES 25hr", "DOM 25hr", "SUB 25hr") ) -> var_info  
+coldata %>% 
+  dplyr::select(condition1) -> var_info  
 
+# row.names <- var_info$SampleID
 
+# row.names(var_info) <- row.names #Assigning row names from as sample names  
+head(var_info)
 
 dlNorm<- dlNorm[, rownames(var_info)]
 all(rownames(var_info) == colnames(dlNorm)) #check
 
 ##following Won's code
-var_info$condition1 %>% 
-  factor(.,levels = c("DOM 25hr","ASC 25hr","DES 25hr", "SUB 25hr")) -> group.dl
+var_info$condition1 %>%
+  factor(.,levels = c("DOM", "DES","ASC", "SUB")) -> group.dl
 
-group.dl<- gsub(" 25hr", "", group.dl)
 
 design.dl <- model.matrix(~ 0 + group.dl)
 colnames(design.dl) -> mycolnames
@@ -264,7 +184,7 @@ abline(h=0.90,col="blue")
 # Mean connectivity as a function of the soft-thresholding power
 plot(sft$fitIndices[,1], sft$fitIndices[,5],
      xlab="Soft Threshold (power)",ylab="Mean Connectivity", type="n",
-     main = "mPFC 70 min:Mean connectivity")
+     main = "mPFC 25hr:Mean connectivity")
 text(sft$fitIndices[,1], sft$fitIndices[,5], labels=powers, cex=cex1,col="red")
 print(sft)
 
@@ -453,10 +373,10 @@ saveRDS(wgcna_all, "manuscript/brain/results_use/WGCNA/WGCNA_WGCNA_MM_GS_mPFC25P
 
 
 ##boxplots
-pfc$SampleID <- paste0(pfc$SampleID, ".")
+# pfc$SampleID <- paste0(pfc$SampleID, ".")
 ME_df <-MEs%>% data.frame() %>% 
   tibble::rownames_to_column(var = "SampleID") %>%
-  pivot_longer(cols = 2:19, names_to = "Module") %>% 
+  pivot_longer(cols = 2:17, names_to = "Module") %>% 
   full_join(pfc) %>% filter(Module != "MEgrey") %>% 
   mutate(status = condition1)
 
@@ -521,10 +441,10 @@ module = 'salmon'
 module = 'cyan'
 module = 'magenta'
 module = 'red'
-module = 'lightcyan'
+
 
 module_list = c("green", "black", "greenyellow", "tan", "turquoise", "yellow", "salmon", 
-                "cyan", "magenta", "red", "lightcyan")
+                "cyan", "magenta", "red" )
 hub_gene_list = vector('list', length = length(module_list))
 names(hub_gene_list) <- module_list
 
@@ -726,7 +646,7 @@ for(x in 1:length(MEs0)){
         summary(lm(df[,8] ~ df[,1]))$coefficients[3,],
         summary(lm(df[,8] ~ df[,2]))$coefficients[3,])%>%
     as.data.frame() %>%
-    cbind(key = c("DES-ASC","DES-Same","ASC-Same")) %>%
+    cbind(key = c("ASC-DES","ASC-Same","DES-Same")) %>%
     mutate(module = md) -> lm_result_list[[x]]
 }
 
@@ -737,5 +657,6 @@ lm_result_list %>%
 
 saveRDS(lm_result_all,"manuscript/brain/results_use/WGCNA/WGCNA_lm_result_mPFC25.RDS")
 
-
-
+# ASpurple midnightblue,green
+#des salmon, pink is 0.6
+lm_result_all

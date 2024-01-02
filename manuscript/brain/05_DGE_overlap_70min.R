@@ -71,10 +71,13 @@ dt_down <- adom_down$symbol[adom_down$symbol %in% dd_down$symbol]%>% as.data.fra
 #significant test
 mat <- matrix(c(66,0,0,62),ncol=2)
 # Perform chi-squared test
-chi_square <- chisq.test(mat)
-chi_square 
+# chi_square <- chisq.test(mat)
+# chi_square 
+# Pearson's Chi-squared test with Yates' continuity correction
+# 
+# data:  mat
+# X-squared = 124.03, df = 1, p-value < 2.2e-16
 
-# subs
 listInput <- list(dsub_up= dsub_up$symbol, as_up=as_up$symbol, dsub_down = dsub_down$symbol, 
                   as_down = as_down$symbol)
 
@@ -88,10 +91,11 @@ st_down <- as_down$symbol[as_down$symbol %in% dsub_down$symbol]%>% as.data.frame
 
 #significant test
 mat <- matrix(c(150,0,0,140),ncol=2)
-# Perform chi-squared test
-chi_square <- chisq.test(mat)
-chi_square
-
+# # Perform chi-squared test
+# chi_square <- chisq.test(mat)
+# chi_square
+# data:  mat
+# X-squared = 286.01, df = 1, p-value < 2.2e-16
 
 # looking for overlap in transition groups between sub and dom comparision 
 listInput <- list(st_up= st_up$., dt_up=dt_up$., st_down = st_down$.,dt_down = dt_down$.)
@@ -106,9 +110,10 @@ t_down <- st_down$.[st_down$. %in% dt_down$.]%>% as.data.frame()
 #significant test
 mat <- matrix(c(8,0,0,10),ncol=2)
 # Perform chi-squared test
-chi_square <- chisq.test(mat)
-chi_square
-
+# chi_square <- chisq.test(mat)
+# chi_square
+# data:  mat
+# X-squared = 14.178, df = 1, p-value = 0.0001663
 
 colnames(dt_up)[1]<- "symbol"
 dt_up <- dt_up %>% mutate(regulated = "up") %>% mutate(condition = "TRN vs DOM") %>% mutate(time = 70)
@@ -145,3 +150,5 @@ df_ds<- dsub %>% select(symbol, ds_logFC= logFC, ds_pv= P.Value) %>%
 dd_st <- df_as %>% full_join(df_ds)
 
 dd_st70 <- dd_st %>% full_join(st)
+
+
