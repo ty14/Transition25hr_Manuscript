@@ -55,7 +55,7 @@ mt %>%
 #70 min 
 my_logFC_threshold = 0.2
 
-limma_list<- readRDS("manuscript/brain/results/limma_PFC70min_ReorganizedGroup.RDS") %>% 
+limma_list<- readRDS("manuscript/brain/results_use/limma_PFC70min_Norm_RG.RDS") %>% 
   map(~distinct(.)) %>% 
   map(~filter(.,abs(logFC) >= my_logFC_threshold)) %>%
   map(~filter(.,P.Value <0.05)) %>%
@@ -70,13 +70,15 @@ ad <- limma_list$ascdom
 
 as <- limma_list$ascsub
 
-
+domsub <- limma_list$domsub
+ades <- limma_list$desasc
 
 dd %>% filter(symbol %in% chol)#0
 ds %>% filter(symbol %in% chol)#2
 ad %>% filter(symbol %in% chol)#1
 as %>% filter(symbol %in% chol)#2
-
+domsub %>% filter(symbol %in% chol)#1
+ades %>% filter(symbol %in% chol)#2
 
 
 dd %>% filter(symbol %in% my)#0
@@ -113,7 +115,7 @@ as %>% filter(symbol %in% mtx)#66
 #25 hour
 my_logFC_threshold = 0.2
 
-limma_list<- readRDS("manuscript/brain/results/limma_PFC_ReorganizedGroups_outlierRemoved.RDS") %>% 
+limma_list<- readRDS("manuscript/brain/results_use/limma_PFC25hr_Norm_RG.RDS") %>% 
   map(~distinct(.)) %>% 
   map(~filter(.,abs(logFC) >= my_logFC_threshold)) %>%
   map(~filter(.,P.Value <0.05)) %>% 
@@ -127,6 +129,8 @@ ds25 <- limma_list$dessub
 ad25 <- limma_list$ascdom
 
 as25 <- limma_list$ascsub
+domsub25 <- limma_list$domsub
+ades25 <- limma_list$desasc
 
 
 dd25 %>% filter(symbol %in% mtx)#22
@@ -138,7 +142,8 @@ dd25 %>% filter(symbol %in% chol)#0
 ds25 %>% filter(symbol %in% chol)#4
 ad25 %>% filter(symbol %in% chol)#1
 as25 %>% filter(symbol %in% chol)#1
-
+domsub25 %>% filter(symbol %in% chol)#1
+ades25 %>% filter(symbol %in% chol)#2
 
 
 dd25 %>% filter(symbol %in% my)#0

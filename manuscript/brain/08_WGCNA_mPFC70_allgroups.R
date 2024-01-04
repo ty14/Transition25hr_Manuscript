@@ -444,9 +444,9 @@ module = 'purple'
 module = 'pink'
 module = 'lightcyan'
 module = 'lightyellow'
-
+module = 'red'
 module_list = c("green", "black", "greenyellow", "tan", "blue", "turquoise", "yellow", "grey60", 
-                "royalblue", "brown", "cyan", "midnightblue", "purple", "pink", "lightcyan", "lightyellow")
+                "royalblue", "brown", "cyan", "midnightblue", "purple", "pink", "lightcyan", "lightyellow", "red")
 hub_gene_list = vector('list', length = length(module_list))
 names(hub_gene_list) <- module_list
 

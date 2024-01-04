@@ -81,7 +81,7 @@ p1 <- p %>% filter(time == "70 min") %>%
   xlab("")+
   theme_bw()+
   theme(legend.position = "none", text =element_text(size = 15))+
-  scale_y_continuous(expand = c(0, 0, 0.2, 0))
+  scale_y_continuous(expand = c(0, 0.2, 0.2, 0))
 p1
 
 ggsave("manuscript/brain/imgs/ache_genes_boxplots70min.png", height =7, width =13, dpi = 300)
@@ -98,7 +98,7 @@ p1 <- p  %>% filter(time == "25 hr") %>%
   xlab("")+
   theme_bw()+
   theme(legend.position = "none", text =element_text(size = 15))+
-  scale_y_continuous(expand = c(0, 0, 0.2, 0))
+  scale_y_continuous(expand = c(0, 0.2, 0.2, 0))
 p1
 ggsave("manuscript/brain/imgs/ache_genes_boxplots25hr.png", height =7, width =13, dpi = 300)
 

@@ -21,8 +21,8 @@ my_logFC_threshold = 0.2
 
 limma_list<- readRDS("manuscript/brain/results_use/limma_PFC70min_Norm_RG.RDS") %>% 
   map(~distinct(.)) %>% 
-  map(~filter(.,abs(logFC) >= my_logFC_threshold)) %>%
-  map(~filter(.,P.Value <0.05)) %>% 
+  # map(~filter(.,abs(logFC) >= my_logFC_threshold)) %>%
+  # map(~filter(.,P.Value <0.05)) %>% 
   map(~ left_join(., grcm38 %>% dplyr::select(symbol, entrez))) %>% 
   map(~filter(.,!is.na(entrez))) 
 
@@ -34,7 +34,8 @@ as <- limma_list$ascsub #864
 
 dsub <- limma_list$dessub #1637
 
-
+x <- adom %>% rbind(dd, as, dsub) 
+xy <- unique(x$symbol)
 
 #upreg
 adom_up <- adom %>% filter(logFC >= 0.2) %>% arrange(-logFC)
