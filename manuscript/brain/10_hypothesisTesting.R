@@ -44,12 +44,21 @@ y1a <- limma_list$ascsub
 
 
 #1 ATP metablic Energy 
-# msigdbr(species = "Mus musculus", subcategory ="GO:BP") -> bp_sets
-# # [2] "GOBP_ATP_METABOLIC_PROCESS"
-# bp_sets %>%
-#   filter(grepl("GOBP_ATP_METABOLIC_PROCESS",gs_name,ignore.case = T)) %>%
-#   select(gene_symbol) %>%  as_tibble() %>%
-            # .$gene_symbol -> enx
+msigdbr(species = "Mus musculus", subcategory ="GO:BP") -> bp_sets
+# [2] "GOBP_ATP_METABOLIC_PROCESS"
+bp_sets %>%
+  filter(grepl("GOBP_ATP_METABOLIC_PROCESS",gs_name,ignore.case = T)) %>%
+  select(gene_symbol) %>%  as_tibble() %>%
+.$gene_symbol -> enx
+
+y4a  %>%
+  filter(symbol %in% enx) %>%
+  dplyr::select(symbol, logFC, P.Value) %>%
+  dplyr::mutate(Sig = ifelse(P.Value >= 0.05, "N.S.",
+                             ifelse(logFC>my_logFC_threshold,"DES genes","DOM genes"))) %>%
+  dplyr::mutate(Sig = factor(Sig, levels = c("DES genes","DOM genes", "N.S."))) %>%
+  dplyr::mutate(P.Value = ifelse(P.Value == 0, 1/10000,P.Value)) %>%
+  unique() -> df
 
 # # 2 Cytokine Signaling
 # msigdbr(species = "Mus musculus", subcategory ="CP:REACTOME") -> reactome_sets
