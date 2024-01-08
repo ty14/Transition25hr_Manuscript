@@ -59,8 +59,8 @@ y4a  %>%
   unique() -> df
 
 keyvals <- ifelse(
-  df$logFC < -my_logFC_threshold & df$P.Value<0.05, 'orange',
-  ifelse(df$logFC > my_logFC_threshold & df$P.Value<0.05, 'purple4',
+  df$logFC < -my_logFC_threshold & df$P.Value<0.05, 'purple4',
+  ifelse(df$logFC > my_logFC_threshold & df$P.Value<0.05, 'red',
          'grey'))
 
 table(keyvals) %>%
@@ -70,9 +70,9 @@ table(keyvals) %>%
 if(is.na(my_texts[2,4])){my_texts[2,4] <- "0 genes"}
 if(is.na(my_texts[3,4])){my_texts[3,4] <- "0 genes"}
 keyvals[is.na(keyvals)] <- 'grey'
-names(keyvals)[keyvals == 'purple4'] <- 'high'
+names(keyvals)[keyvals == 'red'] <- 'high'
 names(keyvals)[keyvals == 'grey'] <- 'mid'
-names(keyvals)[keyvals == 'orange'] <- 'low'
+names(keyvals)[keyvals == 'purple4'] <- 'low'
 
 
 df %>%
@@ -110,9 +110,9 @@ EnhancedVolcano(df,
                 pointSize = 2,
                 labCol = "black",
                 labSize = 2.1)+
-  annotate("text", x = 0.8, y = 4.4,color = "purple4" , size = 2,
+  annotate("text", x = 0.8, y = 4.4,color = "red" , size = 2,
            label =glue::glue(" DES", "\n", "{my_texts[3,4]}"))+
-  annotate("text", x = -0.8, y = 4.4,color = "orange" , size = 2,
+  annotate("text", x = -0.8, y = 4.4,color = "purple4" , size = 2,
            label = glue::glue(" DOM","\n", "{my_texts[2,4]}"))+
   scale_x_continuous(limits = c(-1.5,1.5),breaks = c(-1.5,-1,-0.5,0,0.5,1,1.5))+
   scale_y_continuous(limits = c(-0.1,4.8),breaks = c(0,1,2,3,4),expand=expansion(mult=c(0.0,0.0)))+
@@ -137,8 +137,8 @@ y3a  %>%
   dplyr::mutate(P.Value = ifelse(P.Value == 0, 1/10000,P.Value)) %>%
   unique() -> df
 keyvals <- ifelse(
-  df$logFC < -my_logFC_threshold & df$P.Value<0.05, 'orange',
-  ifelse(df$logFC > my_logFC_threshold & df$P.Value<0.05, 'purple4',
+  df$logFC < -my_logFC_threshold & df$P.Value<0.05, 'purple4',
+  ifelse(df$logFC > my_logFC_threshold & df$P.Value<0.05, 'red',
          'grey'))
 table(keyvals) %>%
   as.data.frame() %>%
@@ -147,9 +147,9 @@ table(keyvals) %>%
 if(is.na(my_texts[2,4])){my_texts[2,4] <- "0 genes"}
 if(is.na(my_texts[3,4])){my_texts[3,4] <- "0 genes"}
 keyvals[is.na(keyvals)] <- 'grey'
-names(keyvals)[keyvals == 'purple4'] <- 'high'
+names(keyvals)[keyvals == 'red'] <- 'high'
 names(keyvals)[keyvals == 'grey'] <- 'mid'
-names(keyvals)[keyvals == 'orange'] <- 'low'
+names(keyvals)[keyvals == 'purple4'] <- 'low'
 df %>%
   filter(P.Value <0.05) %>%
   filter(abs(logFC) > my_logFC_threshold) %>%
@@ -188,9 +188,9 @@ EnhancedVolcano(df,
                 pointSize = 2,
                 labCol = "black",
                 labSize = 2.1)+
-  annotate("text", x = 0.8, y = 4.4,color = "purple4" , size = 2,
+  annotate("text", x = 0.8, y = 4.4,color = "red" , size = 2,
            label =glue::glue(" DES", "\n", "{my_texts[3,4]}"))+
-  annotate("text", x = -0.8, y = 4.4,color = "orange" , size = 2,
+  annotate("text", x = -0.8, y = 4.4,color = "purple4" , size = 2,
            label = glue::glue(" SUB","\n", "{my_texts[2,4]}"))+
   scale_x_continuous(limits = c(-1.5,1.5),breaks = c(-1.5,-1,-0.5,0,0.5,1,1.5))+
   scale_y_continuous(limits = c(-0.1,4.8),breaks = c(0,1,2,3,4),expand=expansion(mult=c(0.0,0.0)))+
@@ -214,8 +214,8 @@ y2a  %>%
   dplyr::mutate(P.Value = ifelse(P.Value == 0, 1/10000,P.Value)) %>%
   unique() -> df
 keyvals <- ifelse(
-  df$logFC < -my_logFC_threshold & df$P.Value<0.05, 'orange',
-  ifelse(df$logFC > my_logFC_threshold & df$P.Value<0.05, 'purple4',
+  df$logFC < -my_logFC_threshold & df$P.Value<0.05, 'purple4',
+  ifelse(df$logFC > my_logFC_threshold & df$P.Value<0.05, 'red',
          'grey'))
 table(keyvals) %>%
   as.data.frame() %>%
@@ -224,9 +224,9 @@ table(keyvals) %>%
 if(is.na(my_texts[2,4])){my_texts[2,4] <- "0 genes"}
 if(is.na(my_texts[3,4])){my_texts[3,4] <- "0 genes"}
 keyvals[is.na(keyvals)] <- 'grey'
-names(keyvals)[keyvals == 'purple4'] <- 'high'
+names(keyvals)[keyvals == 'red'] <- 'high'
 names(keyvals)[keyvals == 'grey'] <- 'mid'
-names(keyvals)[keyvals == 'orange'] <- 'low'
+names(keyvals)[keyvals == 'purple4'] <- 'low'
 
 
 df %>%
@@ -267,9 +267,9 @@ EnhancedVolcano(df,
                 pointSize = 2,
                 labCol = "black",
                 labSize = 2.1)+
-  annotate("text", x = 0.8, y = 4.4,color = "purple4" , size = 2,
+  annotate("text", x = 0.8, y = 4.4,color = "red" , size = 2,
            label =glue::glue(" ASC", "\n", "{my_texts[3,4]}"))+
-  annotate("text", x = -0.8, y = 4.4,color = "orange" , size = 2,
+  annotate("text", x = -0.8, y = 4.4,color = "purple4" , size = 2,
            label = glue::glue(" DOM","\n", "{my_texts[2,4]}"))+
   scale_x_continuous(limits = c(-1.5,1.5),breaks = c(-1.5,-1,-0.5,0,0.5,1,1.5))+
   scale_y_continuous(limits = c(-0.1,4.8),breaks = c(0,1,2,3,4),expand=expansion(mult=c(0.0005,0.0)))+
@@ -293,8 +293,8 @@ y1a  %>%
   dplyr::mutate(P.Value = ifelse(P.Value == 0, 1/10000,P.Value)) %>%
   unique() -> df
 keyvals <- ifelse(
-  df$logFC < -my_logFC_threshold & df$P.Value<0.05, 'orange',
-  ifelse(df$logFC > my_logFC_threshold & df$P.Value<0.05, 'purple4',
+  df$logFC < -my_logFC_threshold & df$P.Value<0.05, 'purple4',
+  ifelse(df$logFC > my_logFC_threshold & df$P.Value<0.05, 'red',
          'grey'))
 table(keyvals) %>%
   as.data.frame() %>%
@@ -303,9 +303,9 @@ table(keyvals) %>%
 if(is.na(my_texts[2,4])){my_texts[2,4] <- "0 genes"}
 if(is.na(my_texts[3,4])){my_texts[3,4] <- "0 genes"}
 keyvals[is.na(keyvals)] <- 'grey'
-names(keyvals)[keyvals == 'purple4'] <- 'high'
+names(keyvals)[keyvals == 'red'] <- 'high'
 names(keyvals)[keyvals == 'grey'] <- 'mid'
-names(keyvals)[keyvals == 'orange'] <- 'low'
+names(keyvals)[keyvals == 'purple4'] <- 'low'
 df %>%
   filter(P.Value <0.05) %>%
   filter(abs(logFC) > my_logFC_threshold) %>%
@@ -343,9 +343,9 @@ EnhancedVolcano(df,
                 pointSize = 2,
                 labCol = "black",
                 labSize = 2.1)+
-  annotate("text", x = 0.8, y = 4.4,color = "purple4" , size = 2,
+  annotate("text", x = 0.8, y = 4.4,color = "red" , size = 2,
            label =glue::glue(" ASC", "\n", "{my_texts[3,4]}"))+
-  annotate("text", x = -0.8, y = 4.4,color = "orange" , size = 2,
+  annotate("text", x = -0.8, y = 4.4,color = "purple4" , size = 2,
            label = glue::glue(" SUB","\n", "{my_texts[2,4]}"))+
   scale_x_continuous(limits = c(-1.5,1.5),breaks = c(-1.5,-1,-0.5,0,0.5,1,1.5))+
   scale_y_continuous(limits = c(-0.1,4.8),breaks = c(0,1,2,3,4),expand=expansion(mult=c(0.0005,0.0)))+
