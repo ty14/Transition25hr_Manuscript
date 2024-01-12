@@ -179,7 +179,7 @@ EnhancedVolcano(df,
                 FCcutoff = 0.0,
                 cutoffLineType = 'blank',
                 drawConnectors = TRUE, # just for a few plots
-                widthConnectors = 0.04, # just for a few plots
+                widthConnectors = 0.08, # just for a few plots
                 vline = c(-0.2, 0.2),
                 vlineCol = c('grey90'),
                 vlineType = c( 'dashed'),

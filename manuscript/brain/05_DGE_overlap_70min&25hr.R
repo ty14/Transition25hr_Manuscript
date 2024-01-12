@@ -291,7 +291,7 @@ colnames(d_up)[1]<- "symbol"
 d_up <- d_up %>% mutate(regulated = "up") %>% mutate(condition = "descenders") %>% mutate(time = 70)
 
 colnames(d_down)[1]<- "symbol"
-d_down <- a_down %>% mutate(regulated = "down") %>% mutate(condition = "descenders") %>% mutate(time = 70)
+d_down <- d_down %>% mutate(regulated = "down") %>% mutate(condition = "descenders") %>% mutate(time = 70)
 
 colnames(d_upx)[1]<- "symbol"
 d_upx <- d_upx %>% mutate(regulated = "up") %>% mutate(condition = "descenders") %>% mutate(time = 25)

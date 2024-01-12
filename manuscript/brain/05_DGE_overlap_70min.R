@@ -70,7 +70,7 @@ dt_down <- adom_down$symbol[adom_down$symbol %in% dd_down$symbol]%>% as.data.fra
 
 
 #significant test
-mat <- matrix(c(66,0,0,62),ncol=2)
+mat <- matrix(c(94,0,1,92),ncol=2)
 # Perform chi-squared test
 # chi_square <- chisq.test(mat)
 # chi_square 
