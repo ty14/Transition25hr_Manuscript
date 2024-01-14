@@ -235,3 +235,20 @@ ggsave("manuscript/brain/results_figures/WGCNA_pfc25_dotplot.png", p25_dot, widt
 
 
 
+
+
+hub <- read.csv("manuscript/brain/results_tables/WGCNA/WCGNA_hubgene_list_mPFC25Power4.csv")
+hub %>% filter(moduleName == "purple", moduleMembership > 0.8) %>% arrange(-moduleMembership) -> hp
+hp
+
+asx %>% filter(symbol %in% hp$symbol)
+adomx %>% filter(symbol %in% hp$symbol)
+
+
+d70 <- readRDS("manuscript/brain/results_use/KIN/kIN_dataframe_mPFC_power5.RDS")
+colnames(d70)
+
+
+d25 <- readRDS("manuscript/brain/results_use/KIN/kIN_dataframe_mPFC25_power4.RDS")
+
+

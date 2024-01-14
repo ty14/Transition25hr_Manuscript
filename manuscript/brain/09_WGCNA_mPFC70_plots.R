@@ -15,6 +15,8 @@ moduleNumber = length(unique(moduleColors))
 modNames = substring(names(MEs), 3)
 
 
+table(module)
+
 moduleColors %>% 
   table() %>% 
   as.data.frame() %>% arrange(Freq)   -> modnum 
@@ -284,7 +286,7 @@ colnames(hub)
 hub$moduleName
 library(tidyverse)
 #red - 17 hub genes 
-hub %>% filter(moduleName == "red", moduleMembership > 0.85) %>% arrange(-moduleMembership)
+hub %>% filter(moduleName == "red", moduleMembership > 0.85) %>% arrange(-moduleMembership) -> hr
 # ENSMUSG00000040536        0.9360687 -0.3114477   Necab1   4
 # 2  ENSMUSG00000032890        0.9224119 -0.3230926    Rims3   4
 # 3  ENSMUSG00000069171        0.9145851 -0.4130442    Nr2f1  13
@@ -292,16 +294,22 @@ hub %>% filter(moduleName == "red", moduleMembership > 0.85) %>% arrange(-module
 # 5  ENSMUSG00000030067        0.9122423 -0.3222683    Foxp1   6
 # 6  ENSMUSG00000021217        0.9082961 -0.3607931    Tshz3   7
 
+dd %>% filter(symbol %in% hr$symbol)
+ds %>% filter(symbol %in% hr$symbol)
+hr
 
 #grey60 - 7 hub genes
-hub %>% filter(moduleName == "grey60", moduleMembership > 0.85) %>% arrange(-moduleMembership)
+hub %>% filter(moduleName == "grey60", moduleMembership > 0.85) %>% arrange(-moduleMembership) ->hg
 # 1 ENSMUSG00000020932        0.9625517 0.3939682   Gfap  11
 # 2 ENSMUSG00000028583        0.9005563 0.2436228   Pdpn   4
 # 3 ENSMUSG00000026728        0.8860994 0.2300441    Vim   2
 # 4 ENSMUSG00000031762        0.8660734 0.3188989    Mt2   8
 
+dd %>% filter(symbol %in% hg$symbol)
+ds %>% filter(symbol %in% hg$symbol)
+
 #pink - 12 hub genes
-hub %>% filter(moduleName == "pink", moduleMembership > 0.85) %>% arrange(-moduleMembership)
+hub %>% filter(moduleName == "pink", moduleMembership > 0.85) %>% arrange(-moduleMembership) -> hp
 # 1  ENSMUSG00000033717        0.9422263 0.4250606  Adra2a  19
 # 2  ENSMUSG00000031557        0.9344391 0.4850286 Plekha2   8
 # 3  ENSMUSG00000044071        0.9135104 0.3010287   Tafa2  10
@@ -309,25 +317,41 @@ hub %>% filter(moduleName == "pink", moduleMembership > 0.85) %>% arrange(-modul
 # 5  ENSMUSG00000035168        0.9053383 0.4349292   Tanc1   2
 # 6  ENSMUSG00000049001        0.9029729 0.5436078    Ndnf   6
 
-
+dd %>% filter(symbol %in% hp$symbol)
+ds %>% filter(symbol %in% hp$symbol)
 #blue - 4 hub genes
-hub %>% filter(moduleName == "blue", moduleMembership > 0.85) %>% arrange(-moduleMembership)
+hb <- hub %>% filter(moduleName == "blue", moduleMembership > 0.85) %>% arrange(-moduleMembership)
 # ensgene moduleMembership   GS.trait symbol chr                              description moduleName
 # 1 ENSMUSG00000043467        0.8716860 -0.2503836 Zbtb37   1 zinc finger and BTB domain containing 37       blue
 # 2 ENSMUSG00000098905        0.8640126 -0.2303895 Zfp953  13                  zinc finger protein 953       blue
 # 3 ENSMUSG00000039153        0.8558831 -0.4232184  Runx2  17      runt related transcription factor 2       blue
 # 4 ENSMUSG00000028427        0.8525530 -0.3151227   Aqp7 
 
+adom %>% filter(symbol %in% hb$symbol)
+as %>% filter(symbol %in% hb$symbol)
+
 #yellow - 9 hub genes
-hub %>% filter(moduleName == "yellow", moduleMembership > 0.85) %>% arrange(-moduleMembership)
+hy <- hub %>% filter(moduleName == "yellow", moduleMembership > 0.85) %>% arrange(-moduleMembership)
 # 1 ENSMUSG00000113004        0.9442418 -0.2598936        Gm47951  13        predicted gene, 47951
 # 2 ENSMUSG00000112122        0.9193776 -0.2193416        Gm47628  10        predicted gene, 47628
 # 3 ENSMUSG00000090619        0.9104870 -0.2269341        Vmn2r60   7   vomeronasal 2, receptor 60
 # 4 ENSMUSG00000069892        0.9044422 -0.2544997 9930111J21Rik2  11 RIKEN cDNA 9930111J21 gene 2
 # 5 ENSMUSG00000117148        0.9034256 -0.2106667       Vmn1r229  17   vomeronasal 1 receptor 229
 
+adom %>% filter(symbol %in% hy$symbol)
+as %>% filter(symbol %in% hy$symbol)
+
+dd%>% filter(symbol %in% hy$symbol)
+ds %>% filter(symbol %in% hy$symbol)
 
 #turquoise- 2 hub genes
-hub %>% filter(moduleName == "turquoise", moduleMembership > 0.85) %>% arrange(-moduleMembership)
+ht <- hub %>% filter(moduleName == "turquoise", moduleMembership > 0.85) %>% arrange(-moduleMembership)
 # 1 ENSMUSG00000020349        0.8924074 -0.2023527 Ppp2ca  11
 # 2 ENSMUSG00000038690        0.8783653  0.2137025 Atp5j2   5
+
+
+adom %>% filter(symbol %in% ht$symbol)
+as %>% filter(symbol %in% ht$symbol)
+
+dd%>% filter(symbol %in% ht$symbol)
+ds %>% filter(symbol %in% ht$symbol)
