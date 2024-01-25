@@ -236,8 +236,9 @@ df.c.diff <- df.c %>% filter(ad70_lf >=0.2 & ad25_lf <= 0.2)
 df.c.diffx <- df.c %>% filter(ad70_lf <=0.2 & ad25_lf >= 0.2)
 df.c.diffxx <- df.c.diff %>% rbind(df.c.diffx)
 
+ad.same <- df.c.samexx
 
-
+ad.diff <- df.c.diffxx
 
 df.g <- ad.df %>% filter(Sig == "N.S.")
 
@@ -287,3 +288,9 @@ ggplot(ad.df, aes(ad70_lf, ad25_lf, group = Sig))+
   xlab("LogFC at 70 min")+
   ggtitle("ASC vs. SUB")+
   theme(plot.title = element_text(hjust = 0.5), text = element_text(size = 15))
+
+
+
+
+ad.same$symbol[ad.same$symbol %in% df.c.samexx$symbol]
+ad.diff$symbol[ad.diff$symbol %in% df.c.diffxx$symbol]
