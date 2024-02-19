@@ -355,3 +355,13 @@ as %>% filter(symbol %in% ht$symbol)
 
 dd%>% filter(symbol %in% ht$symbol)
 ds %>% filter(symbol %in% ht$symbol)
+
+
+#royalblue - 
+hub %>% filter(moduleName == "royalblue", moduleMembership > 0.85) %>% arrange(-moduleMembership) ->hrb
+# 1 ENSMUSG00000020932        0.9625517 0.3939682   Gfap  11
+# 2 ENSMUSG00000028583        0.9005563 0.2436228   Pdpn   4
+# 3 ENSMUSG00000026728        0.8860994 0.2300441    Vim   2
+# 4 ENSMUSG00000031762        0.8660734 0.3188989    Mt2   8
+
+

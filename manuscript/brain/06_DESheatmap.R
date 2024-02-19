@@ -275,7 +275,7 @@ df.c.diffxx <- df.c.diff %>% rbind(df.c.diffx)
 dd.same <- df.c.samexx
 dd.diff <- df.c.diffxx
 
-x <- df.c.samex %>% arrange(ad70_lf) %>% head(.,4)
+x <- df.c.samex %>% arrange(ad70_lf) %>% filter(symbol %in% c("Pyroxd2", "Wdsub1", "Pitpnm3", "Etv6", "Mapkapk2"))
 y <- df.c.samexx %>% arrange(-ad70_lf) %>% head(.,4)
 for_label <- x %>% rbind(y)
 df.g <- ad.df %>% filter(Sig == "N.S.")
@@ -287,12 +287,13 @@ ggplot(ad.df, aes(ad70_lf, ad25_lf, group = Sig))+
   geom_point(data = df.c.samexx, alpha = .4, shape = 21, size = 4, fill = "blue") + 
   geom_point(data = df.c.diffxx, alpha = .4, shape = 21, size = 4, fill = "red") + 
   scale_x_continuous(limits = c(-2,2))+
-  geom_text_repel(data= for_label, aes(label = symbol),vjust=.25,max.overlaps = Inf)+
+  geom_text_repel(data= for_label, aes(label = symbol),vjust=.4, hjust =.8,max.overlaps = Inf)+
   ylim(-2,2)+ theme_classic()+
   ylab("LogFC at 25 hr")+
   xlab("LogFC at 70 min")+
   ggtitle("DES vs. DOM")+
   theme(plot.title = element_text(hjust = 0.5), text = element_text(size = 15))
+
 
 
 #2901 genes at 70 min
@@ -314,19 +315,18 @@ df.c.diffx <- df.c %>% filter(ad70_lf <=0.2 & ad25_lf >= 0.2)
 df.c.diffxx <- df.c.diff %>% rbind(df.c.diffx)
 
 
-x <- df.c.samex %>% arrange(ad70_lf) %>% head(.,5)
-y <- df.c.samexx %>% arrange(-ad70_lf) %>% head(.,5)
+x <- df.c.samex %>% arrange(ad70_lf) %>% filter(symbol %in% c("Etv6", "Dkkl1","Cdkn1c", "Pyroxd2", "Grp", "Smoc2"))
+y <- df.c.samexx %>% arrange(-ad70_lf)%>% filter(symbol %in% c("Ndst4", "Nts","Ndnf", "Adra2a", "Dlk1", "Strip2"))
 for_label <- x %>% rbind(y)
 df.g <- ad.df %>% filter(Sig == "N.S.")
 
- 
-
+library(ggrepel)
 ggplot(ad.df, aes(ad70_lf, ad25_lf, group = Sig))+
   geom_point(data = df.g, alpha = 0.1, shape = 21, size = 3, fill = "grey50") +
   geom_point(data = df.c.samexx, alpha = .4, shape = 21, size = 4, fill = "blue") + 
   geom_point(data = df.c.diffxx, alpha = .4, shape = 21, size = 4, fill = "red") + 
   scale_x_continuous(limits = c(-2,2))+
-  geom_text_repel(data= for_label, aes(label = symbol),vjust=.5,max.overlaps = Inf)+
+  geom_text_repel(data= for_label, aes(label = symbol),vjust=.4, hjust =.75,max.overlaps = Inf)+
   ylim(-2,2)+ theme_classic()+
   ylab("LogFC at 25 hr")+
   xlab("LogFC at 70 min")+
@@ -337,3 +337,7 @@ ggplot(ad.df, aes(ad70_lf, ad25_lf, group = Sig))+
 
 dd.same$symbol[dd.same$symbol %in% df.c.samexx$symbol]
 dd.diff$symbol[dd.diff$symbol %in% df.c.diffxx$symbol]
+
+
+dd.same$symbol[dd.same$symbol %in% df.c.diff$symbol]
+dd.samexx$symbol[dd.samexx$symbol %in% df.c.diffxx$symbol]

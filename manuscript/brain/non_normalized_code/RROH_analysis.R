@@ -21,7 +21,7 @@ grcm38 # mouse genes
 #ALL GROUPS 
 my_logFC_threshold = 0.2
 
-limma_list<- readRDS("manuscript/brain/results/limma_PFC70min_ReorganizedGroup.RDS") %>% 
+limma_list<- readRDS("manuscript/brain/results_use/limma_PFC70min_Norm_RG.RDS") %>% 
   map(~distinct(.)) %>% 
   # map(~filter(.,abs(logFC) >= my_logFC_threshold)) %>%
   # map(~filter(.,P.Value <0.05)) %>% 
@@ -43,7 +43,7 @@ std <- dd %>% rbind(dsub)
 
 # outlier removed 
 
-limma_list<- readRDS("manuscript/brain/results/limma_PFC_ReorganizedGroups_outlierremoved.RDS") %>% 
+limma_list<- readRDS("manuscript/brain/results_use/limma_PFC25hr_Norm_RG.RDS") %>% 
   map(~distinct(.)) %>% 
   # map(~filter(.,abs(logFC) >= my_logFC_threshold)) %>%
   # map(~filter(.,P.Value <0.05)) %>% 
@@ -65,7 +65,7 @@ stdx <- ddx %>% rbind(dsubx)
 
 #ASC vs DOM both timepoints 
 
-l <- list(stax,stdx)
+l <- list(dsub,dsubx)
 names(l) <- c("adom_70", "dd_70")
 lapply(l, head)
 
@@ -128,7 +128,7 @@ list2_DDE <- c(-log10(list2_pvalue_1_200),
 gene_list2 <- data.frame(Genes=Gene,DDE = list2_DDE, stringsAsFactors = FALSE)
 
 library(RRHO2)
-RRHO_obj <-  RRHO2_initialize(gene_list1, gene_list2, labels = c("ASC vs Stable", "DES vs Stable"), log10.ind=TRUE)
+RRHO_obj <-  RRHO2_initialize(gene_list1, gene_list2, labels = c("DES vs SUB 70min", "DES vs SUB 25hr"), log10.ind=TRUE)
 
 
 RRHO2_heatmap(RRHO_obj)

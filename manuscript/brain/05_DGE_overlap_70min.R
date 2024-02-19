@@ -21,8 +21,8 @@ my_logFC_threshold = 0.2
 
 limma_list<- readRDS("manuscript/brain/results_use/limma_PFC70min_Norm_RG.RDS") %>% 
   map(~distinct(.)) %>% 
-  # map(~filter(.,abs(logFC) >= my_logFC_threshold)) %>%
-  # map(~filter(.,P.Value <0.05)) %>% 
+  map(~filter(.,abs(logFC) >= my_logFC_threshold)) %>%
+  map(~filter(.,P.Value <0.05)) %>%
   map(~ left_join(., grcm38 %>% dplyr::select(symbol, entrez))) %>% 
   map(~filter(.,!is.na(entrez))) 
 
@@ -63,8 +63,8 @@ listInput <- list(adom_up= adom_up$symbol, dd_up=dd_up$symbol, adom_down = adom_
 UpSetR::upset(fromList(listInput), nsets = 4, order.by = "freq", keep.order = F)
 
 #getting overlap genes with for dom and trn groups 
-dt_up <- adom_up$symbol[adom_up$symbol %in% dd_up$symbol] %>% as.data.frame()
-dt_down <- adom_down$symbol[adom_down$symbol %in% dd_down$symbol]%>% as.data.frame()
+dt_up <- adom_up$symbol[adom_up$symbol %in% dd_up$symbol] %>% as.data.frame() %>% unique(.)
+dt_down <- adom_down$symbol[adom_down$symbol %in% dd_down$symbol]%>% as.data.frame() %>% unique(.)
 
 
 
@@ -129,10 +129,11 @@ df_dd <- dd %>% select(symbol, dd_logFC= logFC, dd_pv= P.Value) %>%
 df_adom <- adom %>% select(symbol, adom_logFC= logFC, adom_pv= P.Value) %>%
   mutate(time = 70) %>% filter(symbol %in% dt$symbol)
 
-dd_dt <- df_dd %>% full_join(df_adom)
+dd_dt <- df_dd %>% full_join(df_adom) %>% unique(.)
 
-dd_dt70 <- dd_dt %>% full_join(dt)
+# dd_dt70 <- dd_dt %>% full_join(dt)
 
+dd_dt -> dd_dt70
 
 
 colnames(st_up)[1]<- "symbol"
@@ -150,6 +151,6 @@ df_ds<- dsub %>% select(symbol, ds_logFC= logFC, ds_pv= P.Value) %>%
 
 dd_st <- df_as %>% full_join(df_ds)
 
-dd_st70 <- dd_st %>% full_join(st)
+dd_st70 <- dd_st 
 
 

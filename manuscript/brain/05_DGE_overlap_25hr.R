@@ -25,8 +25,8 @@ my_logFC_threshold = 0.2
 
 limma_list<- readRDS("manuscript/brain/results_use/limma_PFC25hr_Norm_RG.RDS") %>% 
   map(~distinct(.)) %>% 
-  # map(~filter(.,abs(logFC) >= my_logFC_threshold)) %>%
-  # map(~filter(.,P.Value <0.05)) %>% 
+  map(~filter(.,abs(logFC) >= my_logFC_threshold)) %>%
+  map(~filter(.,P.Value <0.05)) %>%
   map(~ left_join(., grcm38 %>% dplyr::select(symbol, entrez))) %>% 
   map(~filter(.,!is.na(entrez))) 
 
@@ -125,7 +125,7 @@ dt_up <- dt_up25 %>% mutate(regulated = "up") %>% mutate(condition = "TRN vs DOM
 colnames(dt_down25)[1]<- "symbol"
 dt_down <- dt_down25 %>% mutate(regulated = "down") %>% mutate(condition = "TRN vs DOM") %>% mutate(time =25 )
 
-dt <- dt_up %>%  rbind(dt_down)
+dt <- dt_up %>%  rbind(dt_down) %>% unique(.)
 
 df_dd <- dd %>% select(symbol, dd_logFC= logFC, dd_pv= P.Value) %>%
   mutate(time = 25) %>%  filter(symbol %in% dt$symbol) %>% filter(symbol != "")
@@ -135,7 +135,7 @@ df_adom <- adom %>% select(symbol, adom_logFC= logFC, adom_pv= P.Value) %>%
 
 dd_dt <- df_dd %>% full_join(df_adom)
 
-dd_dt25 <- dd_dt %>% full_join(dt) %>% na.omit(. )
+dd_dt_all  <-dd_dt %>% rbind(dd_dt70) %>% unique(.)
 
 
 
@@ -145,7 +145,7 @@ st_up <- st_up25 %>% mutate(regulated = "up") %>% mutate(condition = "TRN vs SUB
 colnames(st_down25)[1]<- "symbol"
 st_down <- st_down25 %>% mutate(regulated = "down") %>% mutate(condition = "TRN vs SUB") %>% mutate(time = 25)
 
-st <- st_up %>%  rbind(st_down)
+st <- st_up %>%  rbind(st_down) %>% unique(.)
 
 df_as <- as %>% select(symbol, as_logFC= logFC, as_pv= P.Value) %>%
   mutate(time = 25) %>%  filter(symbol %in% st$symbol)
@@ -154,16 +154,16 @@ df_ds<- dsub %>% select(symbol, ds_logFC= logFC, ds_pv= P.Value) %>%
 
 dd_st <- df_as %>% full_join(df_ds)
 
-dd_st25 <- dd_st %>% full_join(st)
+dd_st_all <- dd_st %>% full_join(dd_st70) %>% unique(.)
 
 
 
 source("manuscript/brain/05_DGE_overlap_70min.R")
-dt_all <- dd_dt70 %>% rbind(dd_dt25)
-write.csv(dt_all,"manuscript/brain/results_tables/TRNgenesvsDOM_bothtimepoints.csv", row.names = F)
+# dt_all <- dd_dt70 %>% rbind(dd_dt25) %>% unique(.)
+write.csv(dd_dt_all,"manuscript/brain/results_tables/TRNgenesvsDOM_bothtimepoints.csv", row.names = F)
 
-st_all <- dd_st70 %>% rbind(dd_st25)
-write.csv(st_all,"manuscript/brain/results_tables/TRNgenesvsSUB_bothtimepoints.csv", row.names = F)
+# st_all <- dd_st70 %>% rbind(dd_st25) %>% unique(.)
+write.csv(dd_st_all,"manuscript/brain/results_tables/TRNgenesvsSUB_bothtimepoints.csv", row.names = F)
 
 
 dd_up <- dd_dt70 %>% filter(regulated == "up")

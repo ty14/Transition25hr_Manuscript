@@ -66,11 +66,12 @@ print( cbind(statsObs[, c("medianRank.pres", "medianRank.qual")],
 
 # Module labels and module sizes are also contained in the results
 modColors = rownames(mp$preservation$observed[[ref]][[test]])
+# modColors <-modColors[c(1:11, 13:26)]
 modColorsx = ifelse(modColors == "blue"|modColors ==  "pink"| modColors == "grey60"|modColors ==  "yellow" |modColors ==  "red"| modColors == "turquoise"| modColors == "grey", modColors, "azure2")
 
 moduleSizes = mp$preservation$Z[[ref]][[test]][, 1];
 # leave grey and gold modules out
-plotMods = !(modColorsx %in% c("grey", "gold"));
+plotMods = !(modColorsx %in% c("grey"));
 # Text labels for points
 text = modColors[plotMods];
 # Auxiliary convenience variable
